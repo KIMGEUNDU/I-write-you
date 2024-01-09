@@ -8,7 +8,6 @@ import {
 const Home = lazy(() => import('pages/Home'));
 const RootLayout = lazy(() => import('layout/RootLayout'));
 
-
 const router = createHashRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>

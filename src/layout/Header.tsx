@@ -1,7 +1,5 @@
-import React from 'react'
+/** @jsxImportSource @emotion/react */
 
 export default function Header() {
-  return (
-    <div>Header</div>
-  )
+  return <div>Header</div>;
 }

@@ -1,7 +1,5 @@
-import React from 'react'
+/** @jsxImportSource @emotion/react */
 
 export default function Footer() {
-  return (
-    <div>Footer</div>
-  )
+  return <div>Footer</div>;
 }
