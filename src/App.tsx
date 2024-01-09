@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import router from '@/routes';
 import { RecoilRoot } from 'recoil';
 import { HelmetProvider } from 'react-helmet-async';
