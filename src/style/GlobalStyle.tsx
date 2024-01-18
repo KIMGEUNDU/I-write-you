@@ -5,8 +5,8 @@ const style = css`
     font-family: Pretendard, Inter, Helvetica, Arial, sans-serif;
     line-height: 1.5;
 
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    color: #452e72;
+    background-color: #ed94a1;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
