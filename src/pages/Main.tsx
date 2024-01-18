@@ -7,7 +7,10 @@ const hotpink = css({
   '&:hover': css({ color: 'whitesmoke' }),
 });
 
-export default function Home() {
+export default function Main() {
+  const main = document.querySelector('main');
+  main?.setAttribute('style', 'background: #2D3A6F');
+
   return (
     <>
       <div
@@ -16,7 +19,7 @@ export default function Home() {
           '&:hover': hotpink,
         })}
       >
-        그린
+        첫화면
       </div>
       <div css={hotpink}>핫핑크</div>
     </>
