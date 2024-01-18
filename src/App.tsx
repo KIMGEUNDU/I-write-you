@@ -4,13 +4,16 @@ import { RecoilRoot } from 'recoil';
 import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import GlobalStyle from './style/GlobalStyle';
+import { Suspense } from 'react';
 
 function App() {
   return (
     <RecoilRoot>
       <HelmetProvider>
-        <GlobalStyle />
-        <RouterProvider router={router} />
+        <Suspense>
+          <GlobalStyle />
+          <RouterProvider router={router} />
+        </Suspense>
       </HelmetProvider>
     </RecoilRoot>
   );

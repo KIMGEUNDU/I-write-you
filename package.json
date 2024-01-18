@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.11.0",
     "@supabase/supabase-js": "^2.39.1",
     "@tanstack/react-query": "^5.15.0",
+    "facepaint": "^1.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet-async": "^2.0.4",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@emotion/babel-plugin": "^11.11.0",
     "@tanstack/eslint-plugin-query": "^5.14.6",
+    "@types/facepaint": "^1.2.5",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
