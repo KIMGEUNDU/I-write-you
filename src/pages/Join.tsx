@@ -2,7 +2,7 @@
 
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { CardFlex } from './Login';
+import { CardFlex, InviteCardRibbon, srOnlyStyle } from './Login';
 import { Common } from '@/style/Common';
 import { mq } from '@/style/mq';
 
@@ -17,11 +17,11 @@ export default function Login() {
       </Helmet>
       <section css={CardFlex}>
         <div css={InviteCard}>
-          <h2>회원가입</h2>
+          <h2 css={srOnlyStyle}>회원가입</h2>
           <h3>당신의 호텔을 만들어주세요</h3>
           <form action="" name="loginForm" className="loginForm" method="POST">
             <fieldset>
-              <legend>로그인</legend>
+              <legend css={srOnlyStyle}>로그인</legend>
               <label htmlFor="userId">아이디</label>
               <input
                 id="userId"
@@ -61,11 +61,12 @@ export default function Login() {
               >
                 만들기
               </Link>
-              <button id="cancelBtn" aria-label="회원가입 취소 버튼">
+              <Link to="/login" id="cancelBtn" aria-label="회원가입 취소 버튼">
                 취소
-              </button>
+              </Link>
             </fieldset>
           </form>
+          <div css={InviteCardRibbon}></div>
         </div>
       </section>
     </>
@@ -73,6 +74,7 @@ export default function Login() {
 }
 
 export const InviteCard = mq({
+  position: 'relative',
   width: ['95%', '80%', '80%', '792px'],
   height: ['30%', '35%', '50%', '50%'],
   background: `${Common.colors.lightPink}`,
