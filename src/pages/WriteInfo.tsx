@@ -61,6 +61,30 @@ export default function WriteInfo() {
             })}
           />
         </article>
+        <article
+          css={css({
+            display: 'flex',
+            flexDirection: 'column',
+            margin: '1rem auto 0',
+            width: '16rem',
+          })}
+        >
+          <h3>
+            비회원의 경우, <br />
+            편지를 열람하기 위한 코드가 필요합니다. <br />
+            4자리의 코드를 입력해주세요.
+          </h3>
+          <p
+            css={css({
+              margin: '0.5rem 0',
+            })}
+          >
+            편지 링크와 코드 4자리를 전달하시면, <br />
+            코드 입력 후 편지를 읽을 수 있습니다.
+          </p>
+          <input type="password" name="" id="" minLength={4} maxLength={4} />
+          <input type="password" name="" id="" minLength={4} maxLength={4} />
+        </article>
 
         <button
           type="button"
@@ -69,7 +93,7 @@ export default function WriteInfo() {
             display: 'block',
           })}
         >
-          선택
+          확인
         </button>
       </section>
     </>
