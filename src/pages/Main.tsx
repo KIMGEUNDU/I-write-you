@@ -29,7 +29,7 @@ const div = css({
   position: 'relative',
   overflow: 'hidden',
   width: '100%',
-  height: '100%',
+  height: '100vh',
 });
 
 const title = mq({
@@ -46,7 +46,7 @@ const title = mq({
 const background = mq({
   width: '100%',
   height: '80vh',
-  background: `${Common.colors.mint} url("/sliceHotel.png") no-repeat 50% 90%`,
+  background: `${Common.colors.mint} url("/hotel.png") no-repeat 50% 90%`,
   backgroundSize: 'auto 75%',
   transform: 'translateY(30%)',
   display: 'flex',
