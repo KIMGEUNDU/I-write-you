@@ -17,19 +17,20 @@ export default function Login() {
       </Helmet>
       <section css={CardFlex}>
         <div css={InviteCard}>
-          <h2 css={srOnlyStyle}>로그인</h2>
+          <h2 css={SrOnlyStyle}>로그인</h2>
+          <img css={LoginTitleImage} src="/public/loginImage.png" />
           <form
-            css={LoginForm}
+            css={CardForm}
             action=""
-            name="loginForm"
-            className="loginForm"
+            name="CardForm"
+            className="CardForm"
             method="POST"
           >
             <fieldset
             /* css={css({ display: 'flex', 'flex-direction': 'column' })} */
             >
-              <legend css={srOnlyStyle}>로그인</legend>
-              <label htmlFor="userId" css={srOnlyStyle}>
+              <legend css={SrOnlyStyle}>로그인</legend>
+              <label htmlFor="userId" css={SrOnlyStyle}>
                 아이디
               </label>
               <input
@@ -40,7 +41,7 @@ export default function Login() {
                 placeholder="아이디"
                 required
               />
-              <label htmlFor="userPassword" css={srOnlyStyle}>
+              <label htmlFor="userPassword" css={SrOnlyStyle}>
                 비밀번호
               </label>
               <input
@@ -50,17 +51,17 @@ export default function Login() {
                 name="userPassword"
                 placeholder="비밀번호"
               />
-              <div css={LoginButtonBox}>
+              <div css={CardButtonBox}>
                 <Link
-                  css={LoginButton}
+                  css={CardButton}
                   to="/Join"
                   id="JoinBtn"
                   aria-label="회원가입으로 바로가기"
                 >
-                  호텔만들기
+                  호텔 만들기
                 </Link>
                 <button
-                  css={LoginButton}
+                  css={StampButton}
                   id="loginBtn"
                   aria-label="로그인 버튼"
                   type="submit"
@@ -77,57 +78,13 @@ export default function Login() {
   );
 }
 
-export const LoginButton = css`
-  text-decoration: none;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-  ${mq({
-    fontSize: ['19px', '21px', '25px', '26px'],
-  })};
-  color: ${Common.colors.darkPurple};
-`;
-
-export const LoginButtonBox = css`
-  display: flex;
-
-  justify-content: space-between;
-  ${mq({
-    'margin-top': ['45px', '50px', '60px', '65px'],
-  })}
-`;
-
-export const CardInput = css`
-  ::placeholder {
-    color: ${Common.colors.darkPurple};
-  }
-  margin: 0 auto;
-  border: none;
-  background-color: transparent;
-  color: ${Common.colors.darkNavy};
-
-  ${mq({
-    '&::placeholder': {
-      fontSize: ['21px', '23px', '27px', '28px'],
-    },
-    fontSize: ['21px', '23px', '27px', '28px'],
-    width: '100%',
-    height: ['45px', '55px', '55px', '60px'],
-    margin: ['3px 0', '3px 0', '16px 0', '17px 0'],
-  })}
-`;
-
-export const LoginForm = css`
+export const CardForm = css`
   display: inline-block;
   width: 80%;
-  margin: auto;
+  margin: 0 auto;
   ${mq({
-    width: '70%',
+    width: ['82%', '78%', '70%', '73%'],
   })}
-`;
-
-export const HeightFull = css`
-  height: 100%;
 `;
 
 export const CardFlex = mq({
@@ -140,22 +97,84 @@ export const CardFlex = mq({
 export const InviteCard = mq({
   position: 'relative',
   width: ['95%', '80%', '80%', '792px'],
-  height: ['300px', '390px', '470px', '500px'],
+  height: ['270px', '340px', '440px', '470px'],
   background: `${Common.colors.lightPink}`,
   margin: 'auto',
   display: 'flex',
+  'flex-direction': 'column',
+  'border-radius': '10px',
+  padding: ['14px 0', '15px 0', '18px 0', '20px 0'],
 });
 
-export const srOnlyStyle = css`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+export const CardInput = css`
+  ::placeholder {
+    color: ${Common.colors.darkPurple};
+  }
+  :focus {
+    border-bottom: 1px solid ${Common.colors.darkPurple};
+  }
+  outline: none;
+  margin: 0 auto;
+  border: none;
+  background-color: transparent;
+  color: ${Common.colors.darkNavy};
+
+  ${mq({
+    '&::placeholder': {
+      fontSize: ['21px', '23px', '27px', '28px'],
+    },
+    fontSize: ['20px', '22px', '26px', '27px'],
+    width: '100%',
+    height: ['45px', '55px', '55px', '60px'],
+    'margin-bottom': ['8px', '26px', '34px', '36px'],
+  })}
+`;
+
+export const CardButtonBox = css`
+  display: flex;
+  justify-content: space-between;
+  ${mq({
+    'margin-top': ['10px', '0px', '35px', '20px'],
+  })}
+`;
+
+export const CardButton = css`
+  text-decoration: none;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 10px 0;
+  ${mq({
+    fontSize: ['19px', '21px', '25px', '26px'],
+  })};
+  color: ${Common.colors.darkPurple};
+`;
+
+export const StampButton = css`
+  ${CardButton}
+  ${mq({
+    fontSize: ['19px', '21px', '25px', '26px'],
+  })};
+
+  color: ${Common.colors.darkPurple};
+  background: url('/public/stamp.png') no-repeat;
+  background-position: center right;
+
+  ${mq({
+    fontSize: ['19px', '21px', '25px', '26px'],
+    'padding-right': ['35px', '40px', '50px', '50px'],
+    'background-size': ['35px', '40px', '50px', '50px'],
+  })};
+`;
+
+export const LoginTitleImage = css`
+  margin: 0 auto;
+
+  ${mq({
+    height: ['80px', '100px', '125px', '137px'],
+    'margin-bottom': ['10px', '10px', '15px', '18px'],
+    'margin-top': ['0px', '0px', '10px', '10px'],
+  })};
 `;
 
 export const InviteCardRibbon = css`
@@ -168,4 +187,16 @@ export const InviteCardRibbon = css`
     width: ['190px', '200px', '255px', '270px'],
     height: ['42px', '48px', '63px', '63px'],
   })};
+`;
+
+export const SrOnlyStyle = css`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 `;
