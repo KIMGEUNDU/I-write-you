@@ -1,9 +1,30 @@
 /** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
 
 export default function Write() {
   return (
     <>
-      <h1>편지 쓰기 이미지 추가 페이지</h1>
+      <article
+        css={css({
+          textAlign: 'center',
+        })}
+      >
+        <label htmlFor="photo" className="">
+          <input
+            type="file"
+            accept="image/jpg,image/png,image/jpeg,image/webp,image/avif"
+            name="photo"
+            id="photo"
+          />
+        </label>
+        <div
+          css={css({
+            margin: '0 auto',
+          })}
+        >
+          <img src="/vite.svg" alt="photo" css={css({})} />
+        </div>
+      </article>
     </>
   );
 }
