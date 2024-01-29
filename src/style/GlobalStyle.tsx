@@ -1,11 +1,11 @@
 import { css, Global } from '@emotion/react';
+import { injectGlobal } from '@emotion/css';
 
 const style = css`
   :root {
     font-family: Pretendard, Inter, Helvetica, Arial, sans-serif;
     line-height: 1.5;
 
-    color: #452e72;
     background-color: #ed94a1;
 
     font-synthesis: none;
@@ -124,6 +124,15 @@ const style = css`
     border-collapse: collapse;
     border-spacing: 0;
   }
+`;
+
+injectGlobal`
+  @font-face {
+  font-family: 'InkLipquid';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/InkLipquid.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 `;
 
 const GlobalStyle = () => {
