@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/client';
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
-import { Link } from 'react-router-dom';
+import { letterSentRecent } from '@/util/letterSentRecent';
 
 type SentItemProp = {
   id: number;
@@ -22,7 +23,7 @@ export default function Sent() {
         const { data } = await supabase
           .from('sent')
           .select('id, receiver, created_at');
-        setSentData(data);
+        setSentData(data!.reverse());
       } catch (error) {
         console.log(error);
       }
@@ -45,22 +46,31 @@ export default function Sent() {
       <div css={gridLayout}>
         {/* 보낸 편지 */}
         {sentData &&
-          sentData.map((item: SentItemProp) => (
-            <div css={letterBoxLayout} key={item.id}>
-              <dl css={namePlate}>
-                <dt css={srOnly}>보낸 사람</dt>
-                <dd css={name}>{item.receiver}</dd>
-              </dl>
-              <div css={namePlateLine} aria-hidden />
-              <Link
-                css={letterBox}
-                to={`/sentRead/${item.id}`}
-                aria-label="보낸 편지함"
-              >
-                <img src="/key.png" alt="키" />
-              </Link>
-            </div>
-          ))}
+          sentData.map((item: SentItemProp) => {
+            const isRecent = letterSentRecent(item.created_at);
+            const animationStyle = isRecent
+              ? css`
+                  animation: ${twinkleEffect} 2s alternate infinite;
+                `
+              : '';
+
+            return (
+              <div css={letterBoxLayout} key={item.id}>
+                <dl css={namePlate}>
+                  <dt css={srOnly}>보낸 사람</dt>
+                  <dd css={name}>{item.receiver}</dd>
+                </dl>
+                <div css={namePlateLine} aria-hidden />
+                <Link
+                  css={letterBox}
+                  to={`/sentRead/${item.id}`}
+                  aria-label="보낸 편지함"
+                >
+                  <img css={animationStyle} src="/key.png" alt="키" />
+                </Link>
+              </div>
+            );
+          })}
         {/* 빈 편지함 */}
         {emptyData!.length > 0 &&
           emptyData!.map((_, index) => (
@@ -151,7 +161,7 @@ const letterBox = css({
   '& img': {
     position: 'absolute',
     top: 0,
-    left: '-1.5rem',
+    left: '-1.25rem',
     width: '9.5rem',
     height: '10.625rem',
     objectFit: 'cover',
@@ -165,3 +175,18 @@ const frontMan = css({
   width: '20.5625rem',
   transform: 'translateX(-50%)',
 });
+
+const twinkleEffect = keyframes`
+ 0% {
+    filter: drop-shadow(0 0 3px rgb(245, 198, 159, 0.2));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 18px rgb(245, 198, 159, 0.7));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 3px rgb(245, 198, 159, 0.2));
+  }
+
+`;
