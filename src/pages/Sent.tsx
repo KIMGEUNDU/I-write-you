@@ -1,37 +1,78 @@
 /** @jsxImportSource @emotion/react */
+import { useEffect, useState } from 'react';
+import { supabase } from '@/client';
 import { css } from '@emotion/react';
-import { Common } from '@/style/Common';
 import { mq } from '@/style/mq';
+import { Common } from '@/style/Common';
+import { Link } from 'react-router-dom';
 
-const data = Array(15).fill(1);
+type SentItemProp = {
+  id: number;
+  receiver: string;
+  created_at: string;
+};
 
 export default function Sent() {
+  const [sentData, setSentData] = useState<SentItemProp[] | null>(null);
+  const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
+
+  useEffect(() => {
+    const fetchSent = async () => {
+      try {
+        const { data } = await supabase
+          .from('sent')
+          .select('id, receiver, created_at');
+        setSentData(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchSent();
+  }, []);
+
+  useEffect(() => {
+    if (sentData) {
+      const emptyData = Array(16 - sentData!.length)
+        .fill(0)
+        .map((v, i) => v + i);
+      setEmptyData(emptyData);
+    }
+  }, [sentData, setSentData]);
+
   return (
     <section css={background}>
       <h1 css={srOnly}>보낸 편지함</h1>
-      {/* 보낸 편지: props 통해 img */}
       <div css={gridLayout}>
-        <div css={letterBoxLayout} key={'a'}>
-          <dl css={namePlate}>
-            <dt css={srOnly}>보낸 사람</dt>
-            <dd css={font}>라이온</dd>
-          </dl>
-          <div css={namePlateLine} aria-hidden />
-          <div css={letterBox} aria-label="보낸 편지함">
-            <img src="/key.png" alt="키" />
-          </div>
-        </div>
-        {/* 편지 없을 때 */}
-        {data.map((_, index) => (
-          <div css={letterBoxLayout} key={index}>
-            <dl css={namePlate}>
-              <dt css={srOnly}>보낸 사람</dt>
-              <dd css={font} />
-            </dl>
-            <div css={namePlateLine} aria-hidden />
-            <div css={letterBox} aria-label="빈 편지함" />
-          </div>
-        ))}
+        {/* 보낸 편지 */}
+        {sentData &&
+          sentData.map((item: SentItemProp) => (
+            <div css={letterBoxLayout} key={item.id}>
+              <dl css={namePlate}>
+                <dt css={srOnly}>보낸 사람</dt>
+                <dd css={name}>{item.receiver}</dd>
+              </dl>
+              <div css={namePlateLine} aria-hidden />
+              <Link
+                css={letterBox}
+                to={`/sentRead/${item.id}`}
+                aria-label="보낸 편지함"
+              >
+                <img src="/key.png" alt="키" />
+              </Link>
+            </div>
+          ))}
+        {/* 빈 편지함 */}
+        {emptyData!.length > 0 &&
+          emptyData!.map((_, index) => (
+            <div css={letterBoxLayout} key={index}>
+              <dl css={namePlate}>
+                <dt css={srOnly}>보낸 사람</dt>
+                <dd css={name} />
+              </dl>
+              <div css={namePlateLine} aria-hidden />
+              <div css={letterBox} aria-label="빈 편지함" />
+            </div>
+          ))}
       </div>
       <img src="/frontMan.png" alt="지배인" css={frontMan} />
     </section>
@@ -52,21 +93,25 @@ const srOnly = css({
 const background = css({
   position: 'relative',
   width: '100%',
-  height: 'auto',
   background: `${Common.colors.brown}`,
   margin: 'auto 0',
   paddingTop: '2rem',
-  paddingBottom: '16.25rem',
+  paddingBottom: '265px',
   overflow: 'hidden',
 });
 
-const font = css({
+const name = css({
   position: 'relative',
-  top: '50%',
-  transform: 'translateY(-50%)',
+  top: '55%',
+  left: '50%',
+  transform: 'translateX(-50%) translateY(-50%)',
+  width: '70%',
   fontSize: '1.875rem',
   letterSpacing: '-0.1094rem',
   textAlign: 'center',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 });
 
 const gridLayout = mq({
@@ -114,9 +159,9 @@ const letterBox = css({
 });
 
 const frontMan = css({
-  position: 'absolute',
+  position: 'fixed',
   left: '50%',
-  bottom: '-5rem',
+  bottom: 0,
   width: '20.5625rem',
   transform: 'translateX(-50%)',
 });
