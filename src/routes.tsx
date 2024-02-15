@@ -18,6 +18,7 @@ const WriteInfo = lazy(() => import('pages/WriteInfo'));
 const WriteLetter = lazy(() => import('pages/WriteLetter'));
 const WriteImage = lazy(() => import('pages/WriteImage'));
 const WritePassword = lazy(() => import('pages/WritePassword'));
+const Friend = lazy(() => import('pages/Friend'));
 
 const router = createHashRouter(
   createRoutesFromElements(
@@ -34,6 +35,7 @@ const router = createHashRouter(
       <Route path="writeLetter" element={<WriteLetter />} />
       <Route path="writeImage" element={<WriteImage />} />
       <Route path="writePassword" element={<WritePassword />} />
+      <Route path="friend" element={<Friend />} />
     </Route>
   )
 );
