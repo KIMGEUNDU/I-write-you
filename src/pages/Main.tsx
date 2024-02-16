@@ -3,32 +3,49 @@ import { informationState } from '@/recoil/atom/useOpen';
 import { Common } from '@/style/Common';
 import { mq } from '@/style/mq';
 import { css } from '@emotion/react';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { supabase } from '@/supabaseClient';
 import { useRecoilState } from 'recoil';
 import { TbHandClick } from 'react-icons/tb';
 import { clickAnimation } from '@/util/clickAnimation';
 import { useNavigate } from 'react-router-dom';
+import useSession from '@/store/useSession';
 
 export default function Main() {
   const [open, setOpen] = useRecoilState(informationState);
   const navigate = useNavigate();
+  const session = useSession();
 
   return (
-    <div css={div}>
-      <p css={title}>
-        <span>I WRITE </span>
-        <span css={you}>YOU</span>
-        <button type="button" css={information} onClick={() => setOpen(!open)}>
-          ?
-        </button>
-      </p>
-      <div css={background}>
-        <span css={subTitle}>Save Memories</span>
-        <button type="button" css={clickBtn} onClick={() => navigate('/login')}>
-          <TbHandClick css={click} />
-          check-in
-        </button>
+    <>
+      <div css={div}>
+        <p css={title}>
+          <span>I WRITE </span>
+          <span css={you}>YOU</span>
+          <button type="button" css={information} onClick={() => setOpen(!open)}>
+            ?
+          </button>
+        </p>
+        <div css={background}>
+          <span css={subTitle}>Save Memories</span>
+          <button type="button" css={clickBtn} onClick={() => navigate('/login')}>
+            <TbHandClick css={click} />
+            check-in
+          </button>
+        </div>
       </div>
-    </div>
+      {!session && (
+        <section css={{ maxWidth: '400px', margin: '0 auto' }}>
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            theme="dark"
+            providers={['github']}
+        />
+        </section>
+      )}
+    </>
   );
 }
 
