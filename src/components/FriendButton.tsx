@@ -6,7 +6,7 @@ import { Common } from '@/style/Common';
 import { mq } from '@/style/mq';
 
 type ButtonStyleProps = {
-  size: 'small' | 'medium';
+  size: 'ssmall' | 'small' | 'medium';
   colorType: 'default' | 'red';
 };
 
@@ -32,11 +32,17 @@ const FriendButton = ({ children, onClick, ...styleProps }: BunttonProps) => {
 
 export default FriendButton;
 
-export const buttonSize = {
+const buttonSize = {
+  ssmall: css`
+    ${mq({
+      fontSize: ['16px', '20px', '22px', '22px'],
+      padding: ['3px 10px', '7px 13px', '8px 15px', '8px 15px'],
+    })}
+  `,
   small: css`
     padding: 8px 15px;
     ${mq({
-      fontSize: ['17px', '18px', '19px', ' 20px'],
+      fontSize: ['15px', '18px', '19px', ' 20px'],
     })}
   `,
   medium: css`
@@ -63,7 +69,7 @@ export const RedButton = css`
   }
 `;
 
-export const buttonType = {
+const buttonType = {
   default: DefaultButton,
   red: RedButton,
 };

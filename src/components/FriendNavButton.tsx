@@ -29,7 +29,7 @@ export const NavButton = ({
   value: string;
   state: string;
 }) => css`
-  width: 80%;
+  width: 90%;
 
   & > button {
     border: none;
@@ -48,8 +48,8 @@ export const NavButton = ({
           `
       : css`medium`};
     ${mq({
-      padding: ['21px 50px', '21px 50px', '22px 50px', ' 23px 80px'],
-      fontSize: ['23px', '23px', '26px', ' 27px'],
+      padding: ['8px 50px', '15px 50px', '15px 50px', ' 14px 80px'],
+      fontSize: ['19px', '22px', '24px', ' 25px'],
       width: '100%',
     })};
   }

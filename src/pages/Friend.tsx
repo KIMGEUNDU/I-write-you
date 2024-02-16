@@ -43,11 +43,11 @@ export default function Friend() {
               })}
             >
               <ul
-                css={css({
+                css={mq({
                   display: 'flex',
                   justifyContent: 'center',
                   borderBottom: `solid 2px ${Common.colors.darkNavy}`,
-                  width: '75%',
+                  width: ['90%', '80%', '75%', '75%'],
                 })}
               >
                 {navName.map((i, index) => {
@@ -80,8 +80,8 @@ export const FriendSection = css`
 `;
 
 export const FriendBox = mq({
-  width: ['95%', '90%', '80%', '792px'],
-  height: ['90%', '80%', '80%', '792px'],
+  width: ['100%', '90%', '85%', '792px'],
+  height: ['90%', '90%', '85%', '792px'],
   background: `${Common.colors.lightPink}`,
   margin: 'auto',
   padding: ['30px 0', '32px 0', '38px 0', '40px 0'],
@@ -93,17 +93,11 @@ export const FriendBox = mq({
   transform: 'translate(-50%, -50%)',
 });
 
-export const FriendTitle = css`
-  ${mq({
-    fontSize: ['23px', '25px', '29px', ' 30px'],
-  })}
-`;
-
 export const FreindHeader = css`
   position: relative;
   & > h2 {
     ${mq({
-      fontSize: ['26px', '28px', '30px', ' 32px'],
+      fontSize: ['23px', '25px', '30px', ' 32px'],
     })}
   }
 `;
