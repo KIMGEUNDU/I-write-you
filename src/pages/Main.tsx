@@ -3,24 +3,41 @@ import { informationState } from '@/recoil/atom/useOpen';
 import { Common } from '@/style/Common';
 import { mq } from '@/style/mq';
 import { css } from '@emotion/react';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { supabase } from '@/supabaseClient';
 import { useRecoilState } from 'recoil';
+import useSession from '@/store/useSession';
 
 export default function Main() {
   const [open, setOpen] = useRecoilState(informationState);
+  const session = useSession();
 
   return (
-    <div css={div}>
-      <p css={title}>
-        <span>I WRITE</span>
-        <span css={you}>YOU</span>
-      </p>
-      <div css={background}>
-        <span css={subTitle}>Save Memories</span>
+    <>
+      <div css={div}>
+        <p css={title}>
+          <span>I WRITE</span>
+          <span css={you}>YOU</span>
+        </p>
+        <div css={background}>
+          <span css={subTitle}>Save Memories</span>
+        </div>
+        <button type="button" css={information} onClick={() => setOpen(!open)}>
+          ?
+        </button>
       </div>
-      <button type="button" css={information} onClick={() => setOpen(!open)}>
-        ?
-      </button>
-    </div>
+      {!session && (
+        <section css={{ maxWidth: '400px', margin: '0 auto' }}>
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            theme="dark"
+            providers={['github']}
+          />
+        </section>
+      )}
+    </>
   );
 }
 
