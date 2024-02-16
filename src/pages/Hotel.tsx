@@ -184,7 +184,7 @@ const hotelWrapper = css({
   height: '75%',
   display: 'flex',
   alignItems: 'flex-end',
-  background: `url("/sliceHotel.png") no-repeat center`,
+  background: `url("/hotel.png") no-repeat center`,
   backgroundSize: 'cover',
 });
 

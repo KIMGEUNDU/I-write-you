@@ -72,6 +72,7 @@ const menuList = mq({
   textAlign: 'center',
   padding: '10px 20px',
   fontSize: ['15px', '18px', '20px', '20px'],
+  color: 'white',
 });
 
 const menuButton = mq({
