@@ -12,7 +12,7 @@ import { Common } from '@/style/Common';
 
 type SentItemProp = {
   id: number;
-  receiver: string;
+  sender: string;
   created_at: string;
 };
 
@@ -26,8 +26,8 @@ export default function Sent() {
       try {
         const { data } = await supabase
           .from('letter')
-          .select('id, created_at, receiver');
-        // filter: 로그인 - sender 일치할 경우만
+          .select('id, created_at, sender');
+        // filter: 로그인 - receiver 일치할 경우만
         setSentData(data!.reverse());
       } catch (error) {
         console.log(error);
@@ -67,12 +67,10 @@ export default function Sent() {
                   onMouseLeave={debounce(() => setHover(null))}
                 >
                   <dl css={namePlate}>
-                    <dt css={srOnly}>보낸 사람</dt>
-                    <dd css={name}>{item.receiver}</dd>
+                    <dt css={srOnly}>받는 사람</dt>
+                    <dd css={name}>{item.sender}</dd>
                   </dl>
-                  {hover == item.id && (
-                    <div css={hoverName}>{item.receiver}</div>
-                  )}
+                  {hover == item.id && <div css={hoverName}>{item.sender}</div>}
                 </div>
                 <div css={namePlateLine} aria-hidden />
                 <Link
@@ -89,10 +87,7 @@ export default function Sent() {
         {emptyData!.length > 0 &&
           emptyData!.map((_, index) => (
             <div css={letterBoxLayout} key={index}>
-              <dl css={namePlate}>
-                <dt css={srOnly}>보낸 사람</dt>
-                <dd css={name} />
-              </dl>
+              <div css={namePlate} />
               <div css={namePlateLine} aria-hidden />
               <div css={letterBox} aria-label="빈 편지함" />
             </div>
