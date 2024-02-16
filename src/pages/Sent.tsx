@@ -3,9 +3,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/client';
 import { css, keyframes } from '@emotion/react';
+
+import MenuButton from '@/components/MenuButton';
+import { debounce } from '@/util/debounce';
+import { letterSentRecent } from '@/util/letterSentRecent';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
-import { letterSentRecent } from '@/util/letterSentRecent';
 
 type SentItemProp = {
   id: number;
@@ -16,13 +19,15 @@ type SentItemProp = {
 export default function Sent() {
   const [sentData, setSentData] = useState<SentItemProp[] | null>(null);
   const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
+  const [hover, setHover] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchSent = async () => {
       try {
         const { data } = await supabase
-          .from('sent')
-          .select('id, receiver, created_at');
+          .from('letter')
+          .select('id, created_at, receiver');
+        // filter: 로그인 - sender 일치할 경우만
         setSentData(data!.reverse());
       } catch (error) {
         console.log(error);
@@ -56,10 +61,19 @@ export default function Sent() {
 
             return (
               <div css={letterBoxLayout} key={item.id}>
-                <dl css={namePlate}>
-                  <dt css={srOnly}>보낸 사람</dt>
-                  <dd css={name}>{item.receiver}</dd>
-                </dl>
+                <div
+                  css={nameAnimationLayout}
+                  onMouseEnter={() => setHover(item.id)}
+                  onMouseLeave={debounce(() => setHover(null))}
+                >
+                  <dl css={namePlate}>
+                    <dt css={srOnly}>보낸 사람</dt>
+                    <dd css={name}>{item.receiver}</dd>
+                  </dl>
+                  {hover == item.id && (
+                    <div css={hoverName}>{item.receiver}</div>
+                  )}
+                </div>
                 <div css={namePlateLine} aria-hidden />
                 <Link
                   css={letterBox}
@@ -85,6 +99,7 @@ export default function Sent() {
           ))}
       </div>
       <img src="/frontMan.png" alt="지배인" css={frontMan} />
+      <MenuButton received />
     </section>
   );
 }
@@ -141,10 +156,44 @@ const letterBoxLayout = css({
   alignItems: 'center',
 });
 
+const nameAnimationLayout = css({
+  position: 'relative',
+});
+
 const namePlate = css({
   width: ' 7.875rem',
   height: '3.0625rem',
   background: `url('/namePlate.png') no-repeat center / cover`,
+});
+
+const hoverName = css({
+  position: 'fixed',
+  top: '3rem',
+  width: 'max-contents',
+  padding: '0.125rem 0.75rem',
+  border: `1px solid ${Common.colors.lightYellow}`,
+  borderRadius: '0.375rem',
+  zIndex: 1,
+  background: '#2D3A6F',
+  color: `${Common.colors.lightYellow}`,
+  fontSize: '1.5rem',
+  letterSpacing: '-0.1094rem',
+  textAlign: 'center',
+  transition: 'top 1s ease-in',
+
+  ':hover': {
+    top: '1.5rem',
+    animationDuration: '3s',
+    animationName: keyframes`
+    0% {
+      opacity: 0; 
+    }
+
+    100% {
+      opacity: 1;
+    }
+  `,
+  },
 });
 
 const namePlateLine = css({
