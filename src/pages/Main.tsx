@@ -15,17 +15,11 @@ export default function Main() {
   return (
     <div css={div}>
       <p css={title}>
-        <span>I WRITE</span>
-        <span css={you}>
-          YOU
-          <button
-            type="button"
-            css={information}
-            onClick={() => setOpen(!open)}
-          >
-            ?
-          </button>
-        </span>
+        <span>I WRITE </span>
+        <span css={you}>YOU</span>
+        <button type="button" css={information} onClick={() => setOpen(!open)}>
+          ?
+        </button>
       </p>
       <div css={background}>
         <span css={subTitle}>Save Memories</span>
@@ -55,9 +49,13 @@ const title = mq({
   zIndex: 1,
   fontSize: ['25vw', '20vw', '20vw', '200px'],
   color: Common.colors.lightYellow,
+  width: '100%',
 });
 
 const information = css({
+  position: 'absolute',
+  bottom: '30%',
+  right: '10px',
   border: `none`,
   backgroundColor: Common.colors.darkPurple,
   color: 'white',

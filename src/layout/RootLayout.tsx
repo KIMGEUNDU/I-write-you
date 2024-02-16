@@ -81,7 +81,8 @@ const informationModal = css({
 });
 
 const modal = css({
-  fontFamily: 'InkLipquid',
+  fontFamily: 'GangwonEduHyeonokT_OTFMediumA',
+  fontSize: '20px',
   width: '350px',
   height: '200px',
   backgroundColor: Common.colors.lightYellow,
@@ -91,7 +92,6 @@ const modal = css({
   justifyContent: 'space-between',
   alignItems: 'center',
   textAlign: 'center',
-  fontSize: '18px',
 });
 
 const writeYou = css({
@@ -100,8 +100,8 @@ const writeYou = css({
 });
 
 const create = css({
-  fontFamily: 'InkLipquid',
-  fontSize: '18px',
+  fontFamily: 'GangwonEduHyeonokT_OTFMediumA',
+  fontSize: '22px',
   border: 'none',
   backgroundColor: 'transparent',
   cursor: 'pointer',
