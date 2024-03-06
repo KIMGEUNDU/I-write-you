@@ -3,9 +3,10 @@
 import { Common } from '@/style/Common';
 import { css } from '@emotion/react';
 import mailTruck from '/mailTruck.png';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { mq } from '@/style/mq';
+import { supabase } from '@/supabaseClient';
 
 function MenuButton({
   sent,
@@ -16,8 +17,18 @@ function MenuButton({
   received?: boolean;
   home?: boolean;
 }) {
+  const navigate = useNavigate();
   const [click, setClick] = useState(false);
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.log('로그아웃 중 에러 발생: ', error.message);
+    } else {
+      navigate('/');
+    }
+  };
   return (
     <>
       {click && (
@@ -43,7 +54,9 @@ function MenuButton({
               </NavLink>
             </li>
           )}
-          <li>체크아웃</li>
+          <li onClick={handleLogout} css={css({ cursor: 'pointer' })}>
+            체크아웃
+          </li>
         </ul>
       )}
       <button css={menuButton} type="button" onClick={() => setClick(!click)}>
