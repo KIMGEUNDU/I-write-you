@@ -9,6 +9,7 @@ import { debounce } from '@/util/debounce';
 import { letterSentRecent } from '@/util/letterSentRecent';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
+import LetterPagination from '@/components/LetterPagination';
 
 type ReceivedItemProp = {
   id: number;
@@ -23,6 +24,11 @@ export default function Received() {
   const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
   const [hover, setHover] = useState<number | null>(null);
 
+  // 페이지네이션
+  const [limit] = useState(8);
+  const [page, setPage] = useState(1);
+  const offset = (page - 1) * limit;
+
   useEffect(() => {
     const fetchReceived = async () => {
       try {
@@ -30,7 +36,13 @@ export default function Received() {
           .from('letter')
           .select('id, created_at, receiver');
         // filter: 로그인 - sender 일치할 경우만
-        setReceivedData(data!.reverse());
+        setReceivedData(
+          data!.sort(
+            (a, b) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+          )
+        );
       } catch (error) {
         console.log(error);
       }
@@ -39,21 +51,24 @@ export default function Received() {
   }, []);
 
   useEffect(() => {
-    if (receivedData) {
-      const emptyData = Array(16 - receivedData!.length)
+    if (receivedData && receivedData?.length % limit != 0) {
+      const emptyData = Array(limit - (receivedData!.length % limit))
         .fill(0)
         .map((v, i) => v + i);
       setEmptyData(emptyData);
     }
-  }, [receivedData, setReceivedData]);
+  }, [receivedData, setReceivedData, limit]);
+
+  const numPages = receivedData && Math.ceil(receivedData!.length / limit);
 
   return (
     <section css={background}>
       <h1 css={srOnly}>받는 편지함</h1>
       <div css={gridLayout}>
         {/* 받는 편지 */}
-        {receivedData &&
-          receivedData.map((item: ReceivedItemProp) => {
+        {receivedData
+          ?.slice(offset, offset + limit)
+          .map((item: ReceivedItemProp) => {
             const isRecent = letterSentRecent(item.created_at);
             const animationStyle = isRecent
               ? css`
@@ -87,8 +102,9 @@ export default function Received() {
               </div>
             );
           })}
-        {/* 편지 없을 때 */}
-        {emptyData!.length > 0 &&
+        {/* 빈 편지함 */}
+        {page === numPages &&
+          emptyData!.length > 0 &&
           emptyData!.map((_, index) => (
             <div css={letterBoxLayout} key={index}>
               <div css={namePlate} />
@@ -99,6 +115,14 @@ export default function Received() {
       </div>
       <img src="/mailMan.png" alt="배달원" css={frontMan} />
       <MenuButton sent />
+      <footer css={footerlayout}>
+        <LetterPagination
+          total={receivedData?.length}
+          limit={limit}
+          page={page}
+          setPage={setPage}
+        />
+      </footer>
     </section>
   );
 }
@@ -166,9 +190,18 @@ const namePlate = css({
   background: `url('/namePlate.png') no-repeat center / cover`,
 });
 
+const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
 const hoverName = css({
-  position: 'fixed',
-  top: '3rem',
+  position: 'absolute',
+  top: '0',
   width: 'max-contents',
   padding: '0.125rem 0.75rem',
   border: `1px solid ${Common.colors.lightPink}`,
@@ -179,21 +212,7 @@ const hoverName = css({
   fontSize: '1.5rem',
   letterSpacing: '-0.1094rem',
   textAlign: 'center',
-  transition: 'top 1s ease-in',
-
-  ':hover': {
-    top: '1.5rem',
-    animationDuration: '3s',
-    animationName: keyframes`
-    0% {
-      opacity: 0; 
-    }
-
-    100% {
-      opacity: 1;
-    }
-  `,
-  },
+  animation: `${fadeIn} 0.3s ease-in`,
 });
 
 const namePlateLine = css({
@@ -238,5 +257,9 @@ const twinkleEffect = keyframes`
   100% {
     filter: drop-shadow(0 0 3px rgb(255, 255, 255, 0.4));
   }
-
 `;
+
+const footerlayout = css({
+  display: 'flex',
+  // justifyContent: 'center',
+});
