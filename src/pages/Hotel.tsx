@@ -14,11 +14,22 @@ import empty from '/emptyMail.png';
 import newMail from '/newMail.png';
 import view from '/viewMail.png';
 import EventControl from '@/components/EventControl';
+import { supabase } from '@/supabaseClient';
+import { User } from '@supabase/supabase-js';
 
 export default function Hotel() {
   const navigate = useNavigate();
   const [season, setSeason] = useState('');
   const [control, setControl] = useState(false);
+
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  console.log(currentUser?.user_metadata.preferred_username);
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user ?? null);
+    });
+  }, []);
 
   /* 임시배열 */
   const arr = [
@@ -128,7 +139,7 @@ const background = css({
   overflow: 'hidden',
   width: '100%',
   fontSize: '25px',
-  height: '100%',
+  height: '100vh',
   display: 'flex',
   alignItems: 'flex-end',
 
