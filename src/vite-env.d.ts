@@ -17,3 +17,9 @@ interface Window {
   // Kakao: { VERSION: string, cleanup: () => void, init: (key: string) => void, isInitialized: () => void; };
   Kakao: any;
 }
+
+//친구 - 유저 데이터
+type infoType = {
+  id: string;
+  email: string;
+};

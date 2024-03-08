@@ -11,10 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import FriendNavButton from '@/components/FriendNavButton';
 import { supabase } from '@/client';
 
-type infoType = {
-  id: string;
-  email: string;
-};
+import { useRecoilState } from 'recoil';
+import { usersInfoState, myInfoState } from '@/recoil/atom/useFriend';
 
 export default function Friend() {
   // const main = document.querySelector('main');
@@ -23,17 +21,24 @@ export default function Friend() {
   const [nav, setNav] = useState('목록');
   const navName = ['목록', '요청'];
   const navigate = useNavigate();
+  const [usersInfo, setUsersInfo] = useRecoilState(usersInfoState);
+  const [myInfo, setMyInfo] = useRecoilState(myInfoState);
 
   // 본인 uuid 값와 email 값
-  const [myInfo, setMyInfo] = useState<infoType>({
-    id: '',
-    email: '',
-  });
+  // const [myInfo, setMyInfo] = useState<infoType>({
+  //   id: '',
+  //   email: '',
+  // });
 
   // 다른 사용자들 uuid 값와 email 값 리스트
-  const [userInfo, setUserInfo] = useState<infoType[]>([]);
-  console.log(myInfo);
-  console.log(userInfo);
+  // const [userInfo, setUserInfo] = useState<infoType[]>([]);
+
+  // useEffect(() => {
+  //   console.log(usersInfo);
+
+  //   setUsersInfo((prev) => [...prev, { id: 'd', email: 'ddddd' }]);
+  // }, []);
+  // console.log(usersInfo);
 
   // 본인 값 불러오기
   useEffect(() => {
@@ -43,13 +48,14 @@ export default function Friend() {
           data: { user },
         } = await supabase.auth.getUser();
 
-        setMyInfo({ id: user!.id, email: user!.email! });
+        setMyInfo(() => ({ id: user!.id, email: user!.email! }));
         // const { data } = await supabase
         //   .from('User')
         //   .select('User UID, Display Name');
         // if (data && data.length > 0) {
         //   setmyInfo({ id: data[0].id, userName: data[0].hotelName });
         // }
+        console.log(myInfo);
       } catch (error) {
         console.log(error);
       }
@@ -71,9 +77,10 @@ export default function Friend() {
             email: item.hotelName,
           }));
 
-          setUserInfo(formattedData);
+          setUsersInfo(() => [...formattedData]);
         }
-        console.log(data);
+
+        console.log(usersInfo);
       } catch (error) {
         console.log(error);
       }
