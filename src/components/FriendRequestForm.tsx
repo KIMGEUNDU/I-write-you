@@ -6,28 +6,48 @@ import { Common } from '@/style/Common';
 
 import FriendButton from './FriendButton';
 import { SrOnlyStyle } from '@/pages/Login';
+import { FriendListItem, FriendListNumber } from './FriendList';
+import { FriendRequestBtnBox } from './FriendRequest';
 
 export default function FriendRequestForm() {
   return (
-    <form css={Requestform}>
-      <label css={SrOnlyStyle} htmlFor="friendRequest">
-        친구 요청 보내기
-      </label>
+    <>
+      <form css={Requestform}>
+        <label css={SrOnlyStyle} htmlFor="friendRequest">
+          친구 요청 보내기
+        </label>
 
-      <input
-        css={FriendRequestInput}
-        id="friendRequest"
-        name="friendRequest"
-        type="text"
-        placeholder="(7자~15자)"
-        maxLength={15}
-      />
-      {/* <img src="/public/pass.png" /> */}
+        <input
+          css={FriendRequestInput}
+          id="friendRequest"
+          name="friendRequest"
+          type="text"
+          placeholder="(7자~15자)"
+          maxLength={15}
+        />
+        {/* <img src="/public/pass.png" /> */}
 
-      <FriendButton size="ssmall" colorType="default">
-        보내기
-      </FriendButton>
-    </form>
+        <FriendButton size="ssmall" colorType="default">
+          보내기
+        </FriendButton>
+      </form>
+      <ul>
+        <li css={FriendListItem}>
+          <div css={FriendListNumber}>
+            <span css={SrOnlyStyle}>1</span>
+          </div>
+          <span>name</span>
+          <div css={FriendRequestBtnBox}>
+            <FriendButton size="ssmall" colorType="default">
+              수락
+            </FriendButton>
+            <FriendButton size="ssmall" colorType="red">
+              거절
+            </FriendButton>
+          </div>
+        </li>
+      </ul>
+    </>
   );
 }
 export const Requestform = css`

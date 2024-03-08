@@ -5,10 +5,16 @@ import { mq } from '@/style/mq';
 import { Helmet } from 'react-helmet-async';
 import { Common } from '@/style/Common';
 import FreindList from '@/components/FriendList';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FriendRequest from '@/components/FriendRequest';
 import { useNavigate } from 'react-router-dom';
 import FriendNavButton from '@/components/FriendNavButton';
+import { supabase } from '@/client';
+
+type infoType = {
+  id: string;
+  email: string;
+};
 
 export default function Friend() {
   // const main = document.querySelector('main');
@@ -17,6 +23,63 @@ export default function Friend() {
   const [nav, setNav] = useState('목록');
   const navName = ['목록', '요청'];
   const navigate = useNavigate();
+
+  // 본인 uuid 값와 email 값
+  const [myInfo, setMyInfo] = useState<infoType>({
+    id: '',
+    email: '',
+  });
+
+  // 다른 사용자들 uuid 값와 email 값 리스트
+  const [userInfo, setUserInfo] = useState<infoType[]>([]);
+  console.log(myInfo);
+  console.log(userInfo);
+
+  // 본인 값 불러오기
+  useEffect(() => {
+    const fetchId = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        setMyInfo({ id: user!.id, email: user!.email! });
+        // const { data } = await supabase
+        //   .from('User')
+        //   .select('User UID, Display Name');
+        // if (data && data.length > 0) {
+        //   setmyInfo({ id: data[0].id, userName: data[0].hotelName });
+        // }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchId();
+  }, []);
+
+  // 다른 사용자 값 불러오기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const { data } = await supabase
+          .from('userInfo')
+          .select('id, hotelName');
+        if (data && data.length > 0) {
+          const formattedData = data.map((item: any) => ({
+            // 데이터를 원하는 형식으로 변환합니다.
+            id: item.id,
+            email: item.hotelName,
+          }));
+
+          setUserInfo(formattedData);
+        }
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUserInfo();
+  }, []);
 
   return (
     <>
