@@ -49,26 +49,32 @@ export default function Main() {
         </p>
         <div css={background}>
           <span css={subTitle}>Save Memories</span>
-          <button
-            type="button"
-            css={clickBtn}
-            onClick={() => navigate('/login')}
-          >
+          <button type="button" css={clickBtn} onClick={handleButtonClick}>
             <TbHandClick css={click} />
             check-in
           </button>
         </div>
       </div>
-      {!session && (
-        <section css={{ maxWidth: '400px', margin: '0 auto' }}>
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            theme="dark"
-            providers={['github']}
-          />
-        </section>
-      )}
+      <Modal open={showModal} onClose={closeModal} center>
+        {!session && (
+          <section
+            css={{
+              maxWidth: '400px',
+              minWidth: '250px',
+              margin: '0 auto',
+              paddingTop: '10px',
+              paddingBottom: '10px',
+            }}
+          >
+            <Auth
+              supabaseClient={supabase}
+              appearance={{ theme: ThemeSupa }}
+              theme="dark"
+              providers={['github']}
+            />
+          </section>
+        )}
+      </Modal>
     </>
   );
 }
@@ -95,8 +101,8 @@ const title = mq({
 
 const information = css({
   position: 'absolute',
-  top: '30%',
-  right: '5px',
+  bottom: '30%',
+  right: '10px',
   border: `none`,
   backgroundColor: Common.colors.darkPurple,
   color: 'white',
