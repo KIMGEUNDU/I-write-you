@@ -10,6 +10,7 @@ import { letterState } from '@/recoil/atom/useLetter';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Helmet } from 'react-helmet-async';
+import { mq } from '@/style/mq';
 
 export default function WriteInfo() {
   const [select, setSelect] = useState(false);
@@ -332,10 +333,12 @@ const center = css({
 });
 
 const member = (check: boolean) =>
-  css({
+  mq({
     width: '20rem',
     fontSize: '18px',
     marginBottom: `${check ? '0' : '35px'}`,
+    boxSizing: 'border-box',
+    padding: ['0 20px', '0', '0', '0'],
   });
 
 const label = css({
@@ -397,16 +400,19 @@ const optionItem = css({
   padding: '2px 0',
 });
 
-const nonMember = css({
+const nonMember = mq({
   width: '20rem',
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
   fontSize: '18px',
+  boxSizing: 'border-box',
+  padding: ['0 20px', '0', '0', '0'],
 });
 
-const nonMemberName = css({
-  width: '100%',
+const nonMemberName = mq({
+  boxSizing: 'border-box',
+  width: ['95%', '100%', '100%', '100%'],
   margin: '5px 0 10px 0',
   padding: '4px 10px',
   border: `2px solid ${Common.colors.darkBrown}`,
@@ -435,12 +441,14 @@ const checkIcon = css({
 const nonMemberGuide = css({
   display: 'flex',
   flexDirection: 'column',
-  margin: '1rem auto 0',
+  alignItems: 'center',
+  margin: '1rem 0',
   width: '20rem',
 });
 
-const guide = css({
-  width: '100%',
+const guide = mq({
+  boxSizing: 'border-box',
+  width: ['95%', '100%', '100%', '100%'],
   backgroundColor: Common.colors.darkBrown,
   color: 'white',
   textAlign: 'center',
@@ -452,7 +460,7 @@ const guide = css({
 const secret = css({
   boxSizing: 'border-box',
   width: '100%',
-  padding: '4px 10px',
+  padding: '4px 5px',
   backgroundColor: 'transparent',
   border: 'none',
   borderBottom: '2px solid white',

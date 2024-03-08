@@ -71,10 +71,17 @@ export default function WriteLetter() {
 
   /* 편지지 더보기 오른쪽 */
   const handleRight = () => {
-    if (translate < -1400) {
-      setTranslate(-1920);
-    } else {
-      setTranslate(translate - 400);
+    // const breakpoints = [576, 768, 992, 1200];
+    const size = window.innerWidth;
+
+    if (size <= 576) {
+      setTranslate(Math.max(translate - 400, -2550));
+    } else if (size <= 768) {
+      setTranslate(Math.max(translate - 400, -2350));
+    } else if (size <= 992) {
+      setTranslate(Math.max(translate - 400, -2150));
+    } else if (size >= 1200) {
+      setTranslate(Math.max(translate - 400, -1920));
     }
   };
 
