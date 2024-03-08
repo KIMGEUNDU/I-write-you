@@ -5,25 +5,22 @@ import { User } from '@supabase/supabase-js';
 function MyProfile() {
   const [user, setUser] = useState<User | null>(null);
   const [hotelName, setHotelName] = useState('');
-  console.log(user);
+
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-
-      if (error) {
-        console.error('Error fetching user: ', error);
-      } else if (data) {
-        setUser(data.user);
-
-        if (user) {
-          fetchHotelName();
-        }
-      }
-    };
     fetchUser();
   }, []);
 
-  const fetchHotelName = async () => {
+  const fetchUser = async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) {
+      console.error('Error fetching user: ', error);
+    } else if (data) {
+      setUser(data.user);
+      fetchHotelName(data.user);
+    }
+  };
+
+  const fetchHotelName = async (user: User) => {
     if (user) {
       const { data, error } = await supabase
         .from('userInfo')
