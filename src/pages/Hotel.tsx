@@ -14,18 +14,55 @@ import empty from '/emptyMail.png';
 import newMail from '/newMail.png';
 import view from '/viewMail.png';
 import EventControl from '@/components/EventControl';
+import { supabase } from '@/supabaseClient';
+import { User } from '@supabase/supabase-js';
 
 export default function Hotel() {
   const navigate = useNavigate();
   const [season, setSeason] = useState('');
   const [control, setControl] = useState(false);
+  const [, setUser] = useState<User | null>(null);
+  const [hotelName, setHotelName] = useState('');
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) {
+      console.error('Error fetching user: ', error);
+    } else if (data) {
+      setUser(data.user);
+      fetchHotelName(data.user);
+    }
+  };
+
+  const fetchHotelName = async (user: User) => {
+    if (user) {
+      const { data, error } = await supabase
+        .from('userInfo')
+        .select('hotelName')
+        .eq('id', user.id)
+        .single();
+
+      if (!data) {
+        navigate('/myProfile');
+        return;
+      }
+
+      if (error) {
+        console.error('Error fetching hotel name: ', error);
+      } else if (data) {
+        setHotelName(data.hotelName);
+      }
+    }
+  };
 
   /* 임시배열 */
   const arr = [
     0, 0, 0, 1, 0, 1, 0, 2, 1, 2, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ];
-  /* 임시닉네임 */
-  const nickName = '윤동주이';
 
   /* 현재 달 */
   const currentMonth = () => {
@@ -55,7 +92,7 @@ export default function Hotel() {
   }, []);
 
   return (
-    <div css={background}>
+    <section css={background}>
       <button
         type="button"
         id="writeButton"
@@ -69,44 +106,53 @@ export default function Hotel() {
             }),
           }}
         />
-        편지작성하기
+        편지 쓰기
       </button>
       <div css={hotelWrapper}>
-        <div css={mailWrapper}>
+        <ul css={mailWrapper}>
           {arr.map((v, i) => (
-            <Mail
-              key={i}
-              mail={v}
-              src={v === 0 ? `${empty}` : v === 1 ? `${newMail}` : `${view}`}
-              alt={
-                v === 0 ? '미확인 편지' : v === 1 ? '새로운 편지' : '확인 편지'
-              }
-              link={
-                v === 0
-                  ? '/hotel'
-                  : v === 1
-                  ? '/receivedRead/1'
-                  : '/receivedRead/1'
-              }
-            />
+            <li key={i}>
+              <Mail
+                mail={v}
+                src={v === 0 ? `${empty}` : v === 1 ? `${newMail}` : `${view}`}
+                alt={
+                  v === 0
+                    ? '미확인 편지'
+                    : v === 1
+                    ? '새로운 편지'
+                    : '확인 편지'
+                }
+                link={
+                  v === 0
+                    ? '/hotel'
+                    : v === 1
+                    ? '/receivedRead/1'
+                    : '/receivedRead/1'
+                }
+              />
+            </li>
           ))}
-          <p css={hotelNameWrapper}>{nickName} HOTEL</p>
-        </div>
+          <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
+        </ul>
       </div>
       <MenuButton home={true} />
       <EventControl control={control} setControl={setControl} />
-      {season &&
-        [...new Array(60)].map((v) => (
-          <SeasonEvent
-            key={v}
-            season={season}
-            top={randomPosition(100)}
-            position={randomPosition(100)}
-            color={randomColor(season, randomPosition(3))}
-            control={control}
-          />
-        ))}
-    </div>
+      <ul>
+        {season &&
+          [...new Array(60)].map((v, i) => (
+            <li key={i}>
+              <SeasonEvent
+                key={v}
+                season={season}
+                top={randomPosition(100)}
+                position={randomPosition(100)}
+                color={randomColor(season, randomPosition(3))}
+                control={control}
+              />
+            </li>
+          ))}
+      </ul>
+    </section>
   );
 }
 
@@ -128,30 +174,30 @@ const background = css({
   overflow: 'hidden',
   width: '100%',
   fontSize: '25px',
-  height: '100%',
+  height: '100vh',
   display: 'flex',
   alignItems: 'flex-end',
 
-  '.season:nth-child(2n)': {
+  '.season:nth-of-type(2n)': {
     width: '15px',
     height: '15px',
     animationDuration: '7s',
     animationDelay: '0.5s',
   },
 
-  '.season:nth-child(2n+1)': {
+  '.season:nth-of-type(2n+1)': {
     width: '18px',
     height: '18px',
     animationDuration: '5s',
     animationDelay: '1s',
   },
 
-  '.season:nth-child(4n)': {
+  '.season:nth-of-type(4n)': {
     animationDuration: '3s',
     animationDelay: '2s',
   },
 
-  '.season:nth-child(9n)': {
+  '.season:nth-of-type(9n)': {
     animationDuration: '6s',
     animationDelay: '2s',
   },
@@ -205,15 +251,15 @@ const mailWrapper = mq({
   alignItems: 'flex-start',
   flexWrap: 'wrap',
 
-  '> :nth-child(1)': {
+  '> :nth-of-type(1)': {
     marginLeft: '7px',
   },
 
-  '> :nth-child(8n+1)': {
+  '> :nth-of-type(8n+1)': {
     marginLeft: '7px',
   },
 
-  '> :nth-child(8n)': {
+  '> :nth-of-type(8n)': {
     marginRight: 0,
   },
 });

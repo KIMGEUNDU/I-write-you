@@ -7,7 +7,7 @@ import GlobalStyle from './style/GlobalStyle';
 import { Suspense, useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import { Session } from '@supabase/supabase-js';
-import Main from './pages/Main';
+import openRouter from './openRoutes';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -35,7 +35,7 @@ function App() {
             <RouterProvider router={router} />
           ) : (
             <>
-              <Main />
+              <RouterProvider router={openRouter} />
             </>
           )}
         </Suspense>

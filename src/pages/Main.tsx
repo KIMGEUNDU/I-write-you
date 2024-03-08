@@ -9,13 +9,29 @@ import { supabase } from '@/supabaseClient';
 import { useRecoilState } from 'recoil';
 import { TbHandClick } from 'react-icons/tb';
 import { clickAnimation } from '@/util/clickAnimation';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useSession from '@/store/useSession';
+import { Modal } from 'react-responsive-modal';
+import 'react-responsive-modal/styles.css';
 
 export default function Main() {
   const [open, setOpen] = useRecoilState(informationState);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const session = useSession();
+
+  const handleButtonClick = () => {
+    if (session) {
+      navigate('/hotel');
+    } else {
+      setShowModal(true);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <>
@@ -23,28 +39,42 @@ export default function Main() {
         <p css={title}>
           <span>I WRITE </span>
           <span css={you}>YOU</span>
-          <button type="button" css={information} onClick={() => setOpen(!open)}>
+          <button
+            type="button"
+            css={information}
+            onClick={() => setOpen(!open)}
+          >
             ?
           </button>
         </p>
         <div css={background}>
           <span css={subTitle}>Save Memories</span>
-          <button type="button" css={clickBtn} onClick={() => navigate('/login')}>
+          <button type="button" css={clickBtn} onClick={handleButtonClick}>
             <TbHandClick css={click} />
             check-in
           </button>
         </div>
       </div>
-      {!session && (
-        <section css={{ maxWidth: '400px', margin: '0 auto' }}>
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            theme="dark"
-            providers={['github']}
-        />
-        </section>
-      )}
+      <Modal open={showModal} onClose={closeModal} center>
+        {!session && (
+          <section
+            css={{
+              maxWidth: '400px',
+              minWidth: '250px',
+              margin: '0 auto',
+              paddingTop: '10px',
+              paddingBottom: '10px',
+            }}
+          >
+            <Auth
+              supabaseClient={supabase}
+              appearance={{ theme: ThemeSupa }}
+              theme="dark"
+              providers={['github']}
+            />
+          </section>
+        )}
+      </Modal>
     </>
   );
 }

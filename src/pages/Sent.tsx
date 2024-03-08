@@ -9,6 +9,7 @@ import { debounce } from '@/util/debounce';
 import { letterSentRecent } from '@/util/letterSentRecent';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
+import LetterPagination from '@/components/LetterPagination';
 
 type SentItemProp = {
   id: number;
@@ -16,10 +17,19 @@ type SentItemProp = {
   created_at: string;
 };
 
+//# user filter
+// const authInfo = await supabase.auth.getSession();
+// console.log(authInfo.data.session?.user);
+
 export default function Sent() {
   const [sentData, setSentData] = useState<SentItemProp[] | null>(null);
   const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
   const [hover, setHover] = useState<number | null>(null);
+
+  // 페이지네이션
+  const [limit] = useState(12);
+  const [page, setPage] = useState(1);
+  const offset = (page - 1) * limit;
 
   useEffect(() => {
     const fetchSent = async () => {
@@ -28,7 +38,13 @@ export default function Sent() {
           .from('letter')
           .select('id, created_at, sender');
         // filter: 로그인 - receiver 일치할 경우만
-        setSentData(data!.reverse());
+        setSentData(
+          data!.sort(
+            (a, b) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+          )
+        );
       } catch (error) {
         console.log(error);
       }
@@ -37,55 +53,57 @@ export default function Sent() {
   }, []);
 
   useEffect(() => {
-    if (sentData) {
-      const emptyData = Array(16 - sentData!.length)
+    if (sentData && sentData?.length % limit != 0) {
+      const emptyData = Array(limit - (sentData!.length % limit))
         .fill(0)
         .map((v, i) => v + i);
       setEmptyData(emptyData);
     }
-  }, [sentData, setSentData]);
+  }, [sentData, setSentData, limit]);
+
+  const numPages = sentData && Math.ceil(sentData!.length / limit);
 
   return (
     <section css={background}>
       <h1 css={srOnly}>보낸 편지함</h1>
       <div css={gridLayout}>
         {/* 보낸 편지 */}
-        {sentData &&
-          sentData.map((item: SentItemProp) => {
-            const isRecent = letterSentRecent(item.created_at);
-            const animationStyle = isRecent
-              ? css`
-                  animation: ${twinkleEffect} 2s alternate infinite;
-                `
-              : '';
+        {sentData?.slice(offset, offset + limit).map((item: SentItemProp) => {
+          const isRecent = letterSentRecent(item.created_at);
+          const animationStyle = isRecent
+            ? css`
+                animation: ${twinkleEffect} 2s alternate infinite;
+              `
+            : '';
 
-            return (
-              <div css={letterBoxLayout} key={item.id}>
-                <div
-                  css={nameAnimationLayout}
-                  onMouseEnter={() => setHover(item.id)}
-                  onMouseLeave={debounce(() => setHover(null))}
-                >
-                  <dl css={namePlate}>
-                    <dt css={srOnly}>받는 사람</dt>
-                    <dd css={name}>{item.sender}</dd>
-                  </dl>
-                  {hover == item.id && <div css={hoverName}>{item.sender}</div>}
-                </div>
-                <div css={namePlateLine} aria-hidden />
-                <Link
-                  css={letterBox}
-                  to={`/sentRead/${item.id}`}
-                  aria-label="보낸 편지함"
-                >
-                  <img css={animationStyle} src="/key.png" alt="키" />
-                </Link>
+          return (
+            <div css={letterBoxLayout} key={item.id}>
+              <div
+                css={nameAnimationLayout}
+                onMouseEnter={() => setHover(item.id)}
+                onMouseLeave={debounce(() => setHover(null))}
+              >
+                <dl css={namePlate}>
+                  <dt css={srOnly}>받는 사람</dt>
+                  <dd css={name}>{item.sender}</dd>
+                </dl>
+                {hover == item.id && <div css={hoverName}>{item.sender}</div>}
               </div>
-            );
-          })}
+              <div css={namePlateLine} aria-hidden />
+              <Link
+                css={letterBox}
+                to={`/sentRead/${item.id}`}
+                aria-label="보낸 편지함"
+              >
+                <img css={animationStyle} src="/key.png" alt="키" />
+              </Link>
+            </div>
+          );
+        })}
         {/* 빈 편지함 */}
-        {emptyData!.length > 0 &&
-          emptyData!.map((_, index) => (
+        {page === numPages &&
+          emptyData!.length > 0 &&
+          emptyData?.map((_, index) => (
             <div css={letterBoxLayout} key={index}>
               <div css={namePlate} />
               <div css={namePlateLine} aria-hidden />
@@ -94,6 +112,14 @@ export default function Sent() {
           ))}
       </div>
       <img src="/frontMan.png" alt="지배인" css={frontMan} />
+      <footer css={footerlayout}>
+        <LetterPagination
+          total={sentData?.length}
+          limit={limit}
+          page={page}
+          setPage={setPage}
+        />
+      </footer>
       <MenuButton received />
     </section>
   );
@@ -161,9 +187,18 @@ const namePlate = css({
   background: `url('/namePlate.png') no-repeat center / cover`,
 });
 
+const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
 const hoverName = css({
-  position: 'fixed',
-  top: '3rem',
+  position: 'absolute',
+  top: '0',
   width: 'max-contents',
   padding: '0.125rem 0.75rem',
   border: `1px solid ${Common.colors.lightYellow}`,
@@ -174,21 +209,7 @@ const hoverName = css({
   fontSize: '1.5rem',
   letterSpacing: '-0.1094rem',
   textAlign: 'center',
-  transition: 'top 1s ease-in',
-
-  ':hover': {
-    top: '1.5rem',
-    animationDuration: '3s',
-    animationName: keyframes`
-    0% {
-      opacity: 0; 
-    }
-
-    100% {
-      opacity: 1;
-    }
-  `,
-  },
+  animation: `${fadeIn} 0.3s ease-in`,
 });
 
 const namePlateLine = css({
@@ -232,5 +253,9 @@ const twinkleEffect = keyframes`
   100% {
     filter: drop-shadow(0 0 3px rgb(245, 198, 159, 0.2));
   }
-
 `;
+
+const footerlayout = css({
+  display: 'flex',
+  // justifyContent: 'center',
+});
