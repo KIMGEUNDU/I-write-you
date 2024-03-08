@@ -23,13 +23,21 @@ export default function Main() {
         <p css={title}>
           <span>I WRITE </span>
           <span css={you}>YOU</span>
-          <button type="button" css={information} onClick={() => setOpen(!open)}>
+          <button
+            type="button"
+            css={information}
+            onClick={() => setOpen(!open)}
+          >
             ?
           </button>
         </p>
         <div css={background}>
           <span css={subTitle}>Save Memories</span>
-          <button type="button" css={clickBtn} onClick={() => navigate('/login')}>
+          <button
+            type="button"
+            css={clickBtn}
+            onClick={() => navigate('/login')}
+          >
             <TbHandClick css={click} />
             check-in
           </button>
@@ -42,7 +50,7 @@ export default function Main() {
             appearance={{ theme: ThemeSupa }}
             theme="dark"
             providers={['github']}
-        />
+          />
         </section>
       )}
     </>
@@ -71,8 +79,8 @@ const title = mq({
 
 const information = css({
   position: 'absolute',
-  bottom: '30%',
-  right: '10px',
+  top: '30%',
+  right: '5px',
   border: `none`,
   backgroundColor: Common.colors.darkPurple,
   color: 'white',
