@@ -2,6 +2,7 @@
 import { KAKAO_KEY } from '@/client';
 import { letterState } from '@/recoil/atom/useLetter';
 import { Common } from '@/style/Common';
+import { mq } from '@/style/mq';
 import { css } from '@emotion/react';
 import { useEffect } from 'react';
 import { BiCodeCurly } from 'react-icons/bi';
@@ -120,14 +121,14 @@ const modalWrapper = css({
   backgroundColor: `rgba(105, 105, 105, 0.5)`,
 });
 
-const modal = css({
+const modal = mq({
   position: 'absolute',
   bottom: '20%',
   left: '50%',
   transform: 'translateX(-50%)',
   boxSizing: 'border-box',
   backgroundColor: 'white',
-  width: '40%',
+  width: ['80%', '40%', '40%', '40%'],
   padding: '30px 0',
   borderRadius: '5px',
   textAlign: 'center',

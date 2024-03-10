@@ -10,6 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import gift from '/gift.png';
+import { mq } from '@/style/mq';
 
 function NonMember() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ function NonMember() {
   const [attachmentUrl, setAttachmentUrl] = useState('');
   const [codeModal, setCodeModal] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [windowSize, setWindowSize] = useState(false);
 
   /* 엔터키 누를 경우 암호코드 일치 확인 */
   const clickButton = (e: KeyboardEvent) => {
@@ -48,6 +50,12 @@ function NonMember() {
   };
 
   useEffect(() => {
+    const size = window.innerWidth;
+
+    if (size < 380) {
+      setWindowSize(true);
+    }
+
     /* 인풋 포커스 */
     const keyInput = document.querySelector<HTMLInputElement>('.key');
 
@@ -79,6 +87,8 @@ function NonMember() {
     getLetter();
   }, []);
 
+  console.log(windowSize);
+
   return (
     <>
       <Helmet>{loading && <title>{letter?.sender}님의 편지</title>}</Helmet>
@@ -88,7 +98,12 @@ function NonMember() {
           <>
             <section css={etc}>
               <h3 css={sender}>{letter?.sender}님으로부터</h3>
-              <img css={giftImg} src={gift} alt="열쇠" aria-hidden={true} />
+              <img
+                css={giftImg(windowSize)}
+                src={gift}
+                alt="열쇠"
+                aria-hidden={true}
+              />
               <button type="button" css={reply} onClick={() => navigate('/')}>
                 답장하기
               </button>
@@ -154,11 +169,11 @@ const wrapper = (loading: boolean) =>
     position: 'relative',
   });
 
-const etc = css({
+const etc = mq({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  width: '70%',
+  width: ['90%', '70%', '70%', '70%'],
   fontSize: '20px',
   color: 'white',
   position: 'relative',
@@ -168,14 +183,16 @@ const sender = css({
   fontFamily: 'GowunBatang-Regular',
 });
 
-const giftImg = css({
-  position: 'absolute',
-  top: '-50%',
-  left: '50%',
-  transform: 'translate(-50% -50%)',
-  width: '40px',
-  height: 'auto',
-});
+const giftImg = (windowSize: boolean) =>
+  mq({
+    position: 'absolute',
+    top: ['-40%', '-50%', '-50%', '-50%'],
+    left: '50%',
+    transform: 'translate(-50% -50%)',
+    width: ['30px', '40px', '40px', '40px'],
+    height: 'auto',
+    opacity: `${windowSize ? '0' : '1'}`,
+  });
 
 const reply = css({
   fontFamily: 'GowunBatang-Regular',
@@ -187,9 +204,9 @@ const reply = css({
 });
 
 const letterWrapper = (index: number) =>
-  css({
+  mq({
     boxSizing: 'border-box',
-    width: '70%',
+    width: ['90%', '70%', '70%', '70%'],
     height: '93%',
     background: `url("bg/letter${index}.jpg") no-repeat center`,
     backgroundSize: 'cover',
@@ -201,7 +218,7 @@ const receiver = css({ textAlign: 'left', width: '100%', fontSize: '30px' });
 const contents = css({
   boxSizing: 'border-box',
   width: '100%',
-  height: 'fit-content',
+  height: '100%',
   fontFamily: 'GangwonEduHyeonokT_OTFMediumA',
   fontSize: '20px',
   display: 'flex',
@@ -236,9 +253,9 @@ const secretModalWrapper = css({
   alignItems: 'center',
 });
 
-const secretModal = css({
+const secretModal = mq({
   boxSizing: 'border-box',
-  width: '50%',
+  width: ['80%', '50%', '50%', '50%'],
   height: '300px',
   background: `url("/secretCode.png") no-repeat center`,
   display: 'flex',
