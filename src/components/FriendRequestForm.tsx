@@ -9,7 +9,22 @@ import { SrOnlyStyle } from '@/pages/Login';
 import { FriendListItem, FriendListNumber } from './FriendList';
 import { FriendRequestBtnBox } from './FriendRequest';
 
+import { useRecoilState } from 'recoil';
+import { usersInfoState, myInfoState } from '@/recoil/atom/useFriend';
+
 export default function FriendRequestForm() {
+  // 본인 uuid 값와 email 값
+  const [myInfo, setMyInfo] = useRecoilState(myInfoState);
+
+  // 다른 사용자들 uuid 값와 email 값 리스트
+  const [usersInfo, setUsersInfo] = useRecoilState(usersInfoState);
+
+  //TODO: 친구 친구요청 버튼 누를때 본인값과 상대 값 friend 테이블에 올리기
+  //친구 수락 버튼
+  const handleFriendAccept = (value: infoType) => {
+    console.log(value);
+    console.log(myInfo);
+  };
   return (
     <>
       <form css={Requestform}>
@@ -27,25 +42,30 @@ export default function FriendRequestForm() {
         />
         {/* <img src="/public/pass.png" /> */}
 
-        <FriendButton size="ssmall" colorType="default">
-          보내기
+        <FriendButton size="small" colorType="default">
+          검색
         </FriendButton>
       </form>
       <ul>
-        <li css={FriendListItem}>
-          <div css={FriendListNumber}>
-            <span css={SrOnlyStyle}>1</span>
-          </div>
-          <span>name</span>
-          <div css={FriendRequestBtnBox}>
-            <FriendButton size="ssmall" colorType="default">
-              수락
-            </FriendButton>
-            <FriendButton size="ssmall" colorType="red">
-              거절
-            </FriendButton>
-          </div>
-        </li>
+        {usersInfo.map((value, index) => {
+          return (
+            <li key={index} css={FriendListItem}>
+              <div css={FriendListNumber}>
+                <span css={SrOnlyStyle}>1</span>
+              </div>
+              <span>{value.email}</span>
+              <div css={FriendRequestBtnBox}>
+                <FriendButton
+                  size="ssmall"
+                  colorType="default"
+                  onClick={() => handleFriendAccept(value)}
+                >
+                  친구 요청
+                </FriendButton>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </>
   );
@@ -93,6 +113,6 @@ export const FriendRequestInput = css`
     fontSize: ['20px', '22px', '23px', ' 24px'],
     width: ['55%', '59%', '63%', '67%'],
     height: ['33px', '43px', '43px', '45px'],
-    'margin-bottom': ['8px', '26px', '34px', '36px'],
+    marginBottom: ['8px', '26px', '34px', '36px'],
   })}
 `;

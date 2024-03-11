@@ -40,9 +40,9 @@ const buttonSize = {
     })}
   `,
   small: css`
-    padding: 8px 15px;
+    padding: 8px 30px;
     ${mq({
-      fontSize: ['15px', '18px', '19px', ' 20px'],
+      fontSize: ['16px', '20px', '22px', '22px'],
     })}
   `,
   medium: css`
