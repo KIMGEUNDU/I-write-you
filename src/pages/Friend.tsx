@@ -6,7 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { Common } from '@/style/Common';
 import FreindList from '@/components/FriendList';
 import { useEffect, useState } from 'react';
-import FriendRequest from '@/components/FriendRequest';
+import FriendReceived from '@/components/FriendReceived';
 import { useNavigate } from 'react-router-dom';
 import FriendNavButton from '@/components/FriendNavButton';
 import { supabase } from '@/client';
@@ -23,25 +23,71 @@ export default function Friend() {
   const navigate = useNavigate();
 
   // 본인 uuid 값와 email 값
-  const [myInfo, setMyInfo] = useRecoilState(myInfoState);
+  const [, setMyInfo] = useRecoilState(myInfoState);
 
   // 다른 사용자들 uuid 값와 email 값 리스트
-  const [usersInfo, setUsersInfo] = useRecoilState(usersInfoState);
+  const [, setUsersInfo] = useRecoilState(usersInfoState);
 
-  // 본인 값 불러오기
+  // // 본인 값 불러오기
+  // useEffect(() => {
+  //   const findMyId = async () => {
+  //     try {
+  //       const {
+  //         data: { user },
+  //       } = await supabase.auth.getUser();
+
+  //       setMyInfo(() => ({ id: user!.id, email: '' }));
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   findMyId();
+
+  //   const fetchId = async () => {
+  //     try {
+  //       const { data } = await supabase
+  //         .from('userInfo')
+  //         .select('*')
+  //         .eq('userId', myInfo.id);
+
+  //       setMyInfo(() => ({ id: myInfo!.id, email: data[0].hotelName }));
+  //     } catch (error) {
+  //       console.log('Error fetching UsersInfo: ', error);
+  //     }
+  //   };
+  //   fetchId();
+  // }, []);
+  //* 본인 값 불러오고 그 값으로 자신의 hotelName 가져오기
   useEffect(() => {
-    const fetchId = async () => {
+    const findAndFetchMyId = async () => {
       try {
+        // 사용자 기본 정보를 불러옵니다.
         const {
           data: { user },
         } = await supabase.auth.getUser();
 
-        setMyInfo(() => ({ id: user!.id, email: user!.email! }));
+        if (user) {
+          // userId를 이용해 추가 정보를 조회합니다.
+          const { data: userInfo, error } = await supabase
+            .from('userInfo')
+            .select('*')
+            .eq('userId', user.id);
+
+          // 에러가 없으면 상태를 한 번만 업데이트합니다.
+          if (!error && userInfo.length > 0) {
+            // 사용자 정보와 추가 정보 모두를 상태에 설정합니다.
+            setMyInfo({ id: user.id, email: userInfo[0].hotelName });
+          } else {
+            // userInfo가 비어있거나 오류가 발생한 경우, 사용자 기본 정보만으로 상태를 업데이트합니다.
+            setMyInfo({ id: user.id, email: '' });
+          }
+        }
       } catch (error) {
-        console.log(error);
+        console.log('Error fetching user info: ', error);
       }
     };
-    fetchId();
+
+    findAndFetchMyId();
   }, []);
 
   // 다른 사용자 값 불러오기
@@ -111,7 +157,7 @@ export default function Friend() {
                 })}
               </ul>
             </nav>
-            {nav === '목록' ? <FreindList /> : <FriendRequest />}
+            {nav === '목록' ? <FreindList /> : <FriendReceived />}
           </section>
         </div>
       </section>

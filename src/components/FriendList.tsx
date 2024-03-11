@@ -46,7 +46,7 @@ export const FriendListItem = css`
   justify-content: space-between;
   gap: 20px;
   ${mq({
-    margin: ['17px auto', '18px auto', '20px auto', '21px auto'],
+    margin: ['17px auto', '16px auto', '17px auto', '21px auto'],
   })};
 
   & > span {

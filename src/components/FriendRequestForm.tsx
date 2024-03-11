@@ -7,22 +7,48 @@ import { Common } from '@/style/Common';
 import FriendButton from './FriendButton';
 import { SrOnlyStyle } from '@/pages/Login';
 import { FriendListItem, FriendListNumber } from './FriendList';
-import { FriendRequestBtnBox } from './FriendRequest';
+import { FriendRequestBtnBox } from './FriendReceived';
+import { supabase } from '@/client';
 
 import { useRecoilState } from 'recoil';
 import { usersInfoState, myInfoState } from '@/recoil/atom/useFriend';
 
 export default function FriendRequestForm() {
   // 본인 uuid 값와 email 값
-  const [myInfo, setMyInfo] = useRecoilState(myInfoState);
+  const [myInfo] = useRecoilState(myInfoState);
 
   // 다른 사용자들 uuid 값와 email 값 리스트
-  const [usersInfo, setUsersInfo] = useRecoilState(usersInfoState);
+  const [usersInfo] = useRecoilState(usersInfoState);
 
-  //TODO: 친구 친구요청 버튼 누를때 본인값과 상대 값 friend 테이블에 올리기
-  //친구 수락 버튼
-  const handleFriendAccept = (value: infoType) => {
-    console.log(value);
+  let filterUsersInfo: infoType[] = [];
+  //* 사용자들 정보에서 내정보 필터링
+  filterUsersInfo = usersInfo.filter((i) => i.id !== myInfo.id);
+
+  //친구 요청 버튼
+  const handleFriendRequest = async (value: infoType) => {
+    //TODO: 친구 요청 할때 이미 요청했거나, 친구인 사용자는 제외하기
+    // if (myInfo) {
+    //   const { data: userInfo, error } = await supabase
+    //         .from('friends')
+    //         .select('senderId,receiverName')
+    //   if((senderId===myInfo.id && receiverId===value.id)||(senderId===value.id && receiverId===myInfo.id))
+    const { data, error } = await supabase.from('friends').upsert([
+      {
+        senderId: myInfo.id,
+        senderName: myInfo.email,
+        receiverId: value.id,
+        receiverName: value.email,
+        status: false,
+      },
+    ]);
+
+    if (error) {
+      console.error('Error fetching UsersInfo: ', error);
+    } else {
+      console.log('UserInfo updated successfully: ', data);
+    }
+
+    console.log(value, value.id);
     console.log(myInfo);
   };
   return (
@@ -47,7 +73,7 @@ export default function FriendRequestForm() {
         </FriendButton>
       </form>
       <ul>
-        {usersInfo.map((value, index) => {
+        {filterUsersInfo.map((value, index) => {
           return (
             <li key={index} css={FriendListItem}>
               <div css={FriendListNumber}>
@@ -58,7 +84,7 @@ export default function FriendRequestForm() {
                 <FriendButton
                   size="ssmall"
                   colorType="default"
-                  onClick={() => handleFriendAccept(value)}
+                  onClick={() => handleFriendRequest(value)}
                 >
                   친구 요청
                 </FriendButton>
@@ -73,7 +99,7 @@ export default function FriendRequestForm() {
 export const Requestform = css`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   position: relative;
   & > img {
     position: absolute;
@@ -99,7 +125,7 @@ export const FriendRequestInput = css`
   background-position: right 10px top 50%;
   background-size: 6%;
 
-  padding: 0 60px 0 23px;
+  padding: 0 60px 0 20px;
   border: none;
   border-radius: 25px;
   background-color: white;
@@ -113,6 +139,6 @@ export const FriendRequestInput = css`
     fontSize: ['20px', '22px', '23px', ' 24px'],
     width: ['55%', '59%', '63%', '67%'],
     height: ['33px', '43px', '43px', '45px'],
-    marginBottom: ['8px', '26px', '34px', '36px'],
+    marginBottom: ['8px', '20px', '20px', '30px'],
   })}
 `;
