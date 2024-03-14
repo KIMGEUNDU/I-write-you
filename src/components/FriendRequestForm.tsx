@@ -12,6 +12,7 @@ import { supabase } from '@/client';
 
 import { useRecoilState } from 'recoil';
 import { usersInfoState, myInfoState } from '@/recoil/atom/useFriend';
+import { useEffect, useState } from 'react';
 
 export default function FriendRequestForm() {
   // 본인 uuid 값와 email 값
@@ -20,18 +21,49 @@ export default function FriendRequestForm() {
   // 다른 사용자들 uuid 값와 email 값 리스트
   const [usersInfo] = useRecoilState(usersInfoState);
 
-  let filterUsersInfo: infoType[] = [];
-  //* 사용자들 정보에서 내정보 필터링
-  filterUsersInfo = usersInfo.filter((i) => i.id !== myInfo.id);
+  // let filterUsersInfo: infoType[] = [];
+  const [filterUsersInfo, setFilterUsersInfo] = useState<infoType[]>([]);
+  // useEffect(() => {
 
+  // }, []);
+  // console.log(filterUsersInfo);
+
+  //* 사용자들 정보에서 내정보 필터링
+  //TODO: 친구 요청 할때 이미 요청했거나, 친구인 사용자는 제외하기
+  useEffect(() => {
+    const fetchFriendList = async () => {
+      try {
+        const { data } = await supabase
+          .from('friends')
+          .select('*')
+          .or(`senderId.eq.${myInfo.id},receiverId.eq.${myInfo.id}`);
+
+        //친구 요청 할때 이미 요청했거나, 친구인 사용자
+        const friendList = data!.map((i) =>
+          i.senderId === myInfo.id ? i.receiverName : i.senderName
+        );
+        console.log(friendList);
+
+        //*본인과 친구 요청 할때 이미 요청했거나, 친구인 사용자 필터링
+        setFilterUsersInfo(
+          usersInfo.filter(
+            (i) => i.id !== myInfo.id && !friendList.includes(i.email)
+          )
+        );
+        // setFilterUsersInfo(usersInfo.filter((i) => i.id !== myInfo.id));
+        // setFilterUsersInfo((prev) =>
+        //   prev.filter((i) => !friendList.includes(i.email))
+        // );
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+      }
+      // setFilterUsersInfo((prev) => ({
+      //   prev.filter((i)=>{})})
+    };
+    fetchFriendList();
+  }, []);
   //친구 요청 버튼
   const handleFriendRequest = async (value: infoType) => {
-    //TODO: 친구 요청 할때 이미 요청했거나, 친구인 사용자는 제외하기
-    // if (myInfo) {
-    //   const { data: userInfo, error } = await supabase
-    //         .from('friends')
-    //         .select('senderId,receiverName')
-    //   if((senderId===myInfo.id && receiverId===value.id)||(senderId===value.id && receiverId===myInfo.id))
     const { data, error } = await supabase.from('friends').upsert([
       {
         senderId: myInfo.id,
@@ -43,13 +75,10 @@ export default function FriendRequestForm() {
     ]);
 
     if (error) {
-      console.error('Error fetching UsersInfo: ', error);
+      console.error('업데이트 중 오류 발생: ', error);
     } else {
-      console.log('UserInfo updated successfully: ', data);
+      console.log('업데이트 성공: ', data);
     }
-
-    console.log(value, value.id);
-    console.log(myInfo);
   };
   return (
     <>

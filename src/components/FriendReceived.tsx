@@ -27,17 +27,17 @@ export default function FriendReceived() {
   useEffect(() => {
     const FetchFriendReceived = async () => {
       try {
-        const { data: friendReceived, error } = await supabase
+        const { data: friendReceived } = await supabase
           .from('friends')
           .select('*')
           .eq('receiverId', myInfo.id);
 
-        //TODO: status가 true 면 보이면 안됨.
-        if (!error && friendReceived.length > 0) {
+        //T status가 true 면 보이면 안됨.
+        if (friendReceived) {
           //친구 status 상태가 false인 것만 출력
           setFriendReceivedData(
             friendReceived.filter((value) => {
-              !value.status;
+              return value.status === false;
             })
           );
         }
@@ -55,9 +55,16 @@ export default function FriendReceived() {
       const { data } = await supabase
         .from('friends') // 'friends' 테이블 선택
         .update({ status: true }) // status 값을 true로 업데이트
-        .eq('senderId', value.senderId) // senderId가 '123'인 조건
-        .eq('receiverId', value.receiverId); // receiverId가 '345'인 조건
-
+        .eq('senderId', value.senderId)
+        .eq('receiverId', value.receiverId);
+      // 수락버튼 누르자마자 받은 친구 요청에서 사라짐.
+      setFriendReceivedData((prev) =>
+        prev.filter(
+          (request) =>
+            request.senderId !== value.senderId ||
+            request.receiverId !== value.receiverId
+        )
+      );
       console.log('업데이트 성공:', data);
     } catch (error) {
       console.error('업데이트 중 오류 발생:', error);

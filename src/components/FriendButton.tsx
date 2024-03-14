@@ -35,14 +35,14 @@ export default FriendButton;
 const buttonSize = {
   ssmall: css`
     ${mq({
-      fontSize: ['16px', '20px', '22px', '22px'],
+      fontSize: ['16px', '18px', '19px', '19px'],
       padding: ['3px 10px', '7px 13px', '8px 15px', '8px 15px'],
     })}
   `,
   small: css`
     padding: 8px 30px;
     ${mq({
-      fontSize: ['16px', '20px', '22px', '22px'],
+      fontSize: ['16px', '18px', '19px', '19px'],
     })}
   `,
   medium: css`
@@ -55,6 +55,7 @@ export const DefaultButton = css`
   background-color: ${Common.colors.lightMint};
   color: white;
   border: none;
+  cursor: pointer;
   &:hover {
     background-color: #3b9bb2;
   }
@@ -64,6 +65,7 @@ export const RedButton = css`
   background-color: #ff6d6d;
   color: white;
   border: none;
+  cursor: pointer;
   &:hover {
     background-color: #e84343;
   }
