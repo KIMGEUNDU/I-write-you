@@ -77,6 +77,11 @@ export default function Friend() {
           if (!error && userInfo.length > 0) {
             // 사용자 정보와 추가 정보 모두를 상태에 설정합니다.
             setMyInfo({ id: user.id, email: userInfo[0].hotelName });
+            //localStorage에 나의 정보 담기
+            localStorage.setItem(
+              'myInfo',
+              JSON.stringify({ id: user.id, email: userInfo[0].hotelName })
+            );
           } else {
             // userInfo가 비어있거나 오류가 발생한 경우, 사용자 기본 정보만으로 상태를 업데이트합니다.
             setMyInfo({ id: user.id, email: '' });

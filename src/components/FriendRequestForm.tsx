@@ -12,7 +12,7 @@ import { supabase } from '@/client';
 
 import { useRecoilState } from 'recoil';
 import { usersInfoState, myInfoState } from '@/recoil/atom/useFriend';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function FriendRequestForm() {
   // 본인 uuid 값와 email 값
@@ -23,10 +23,6 @@ export default function FriendRequestForm() {
 
   // let filterUsersInfo: infoType[] = [];
   const [filterUsersInfo, setFilterUsersInfo] = useState<infoType[]>([]);
-  // useEffect(() => {
-
-  // }, []);
-  // console.log(filterUsersInfo);
 
   //* 사용자들 정보에서 내정보 필터링
   //TODO: 친구 요청 할때 이미 요청했거나, 친구인 사용자는 제외하기
@@ -42,7 +38,6 @@ export default function FriendRequestForm() {
         const friendList = data!.map((i) =>
           i.senderId === myInfo.id ? i.receiverName : i.senderName
         );
-        console.log(friendList);
 
         //*본인과 친구 요청 할때 이미 요청했거나, 친구인 사용자 필터링
         setFilterUsersInfo(
@@ -50,10 +45,6 @@ export default function FriendRequestForm() {
             (i) => i.id !== myInfo.id && !friendList.includes(i.email)
           )
         );
-        // setFilterUsersInfo(usersInfo.filter((i) => i.id !== myInfo.id));
-        // setFilterUsersInfo((prev) =>
-        //   prev.filter((i) => !friendList.includes(i.email))
-        // );
       } catch (error) {
         console.error('Error fetching friends:', error);
       }
@@ -62,24 +53,37 @@ export default function FriendRequestForm() {
     };
     fetchFriendList();
   }, []);
-  //친구 요청 버튼
-  const handleFriendRequest = async (value: infoType) => {
-    const { data, error } = await supabase.from('friends').upsert([
-      {
-        senderId: myInfo.id,
-        senderName: myInfo.email,
-        receiverId: value.id,
-        receiverName: value.email,
-        status: false,
-      },
-    ]);
 
-    if (error) {
-      console.error('업데이트 중 오류 발생: ', error);
-    } else {
-      console.log('업데이트 성공: ', data);
-    }
-  };
+  //친구 요청 버튼
+  const handleFriendRequest = useCallback(
+    async (value: infoType) => {
+      const { data, error } = await supabase.from('friends').upsert([
+        {
+          senderId: myInfo.id,
+          senderName: myInfo.email,
+          receiverId: value.id,
+          receiverName: value.email,
+          status: false,
+        },
+      ]);
+      if (error) {
+        console.error('업데이트 중 오류 발생: ', error);
+      } else {
+        //TODO: 친구요청하면 리스트에서 바로 사라지게하기
+        // setFilterUsersInfo(
+        //   (prev) =>
+        // prev.filter(
+        //   (i) =>
+        //   i.senderId !== value.senderId ||
+        //   i.receiverId !== value.receiverId
+        // )
+        // );
+        console.log('업데이트 성공: ', data);
+      }
+    },
+    [myInfo.id, myInfo.email]
+  );
+
   return (
     <>
       <form css={Requestform}>
@@ -106,7 +110,7 @@ export default function FriendRequestForm() {
           return (
             <li key={index} css={FriendListItem}>
               <div css={FriendListNumber}>
-                <span css={SrOnlyStyle}>1</span>
+                <span css={SrOnlyStyle}>{index}</span>
               </div>
               <span>{value.email}</span>
               <div css={FriendRequestBtnBox}>

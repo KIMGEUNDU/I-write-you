@@ -56,7 +56,8 @@ export default function FriendReceived() {
         .from('friends') // 'friends' 테이블 선택
         .update({ status: true }) // status 값을 true로 업데이트
         .eq('senderId', value.senderId)
-        .eq('receiverId', value.receiverId);
+        .eq('receiverId', value.receiverId)
+        .eq('status', false);
       // 수락버튼 누르자마자 받은 친구 요청에서 사라짐.
       setFriendReceivedData((prev) =>
         prev.filter(
@@ -73,7 +74,26 @@ export default function FriendReceived() {
 
   //친구 거절 버튼
   const handleRejectFriend = async (value: friendData) => {
-    console.log('거절', value);
+    try {
+      const { data } = await supabase
+        .from('friends') // 'friends' 테이블 선택
+        .delete()
+        .eq('senderId', value.senderId)
+        .eq('receiverId', value.receiverId)
+        // status가 false인 값만
+        .eq('status', false);
+      // 거절버튼 누르자마자 받은 친구 요청에서 사라짐.
+      setFriendReceivedData((prev) =>
+        prev.filter(
+          (request) =>
+            request.senderId !== value.senderId ||
+            request.receiverId !== value.receiverId
+        )
+      );
+      console.log('친구거절 성공:', data);
+    } catch (error) {
+      console.error('친구거절 중 오류 발생:', error);
+    }
   };
 
   return (
@@ -87,7 +107,7 @@ export default function FriendReceived() {
           return (
             <li css={FriendListItem} key={index}>
               <div css={FriendListNumber}>
-                <span css={SrOnlyStyle}>1</span>
+                <span css={SrOnlyStyle}>{index}</span>
               </div>
               <span>{value.senderName}</span>
               <div css={FriendRequestBtnBox}>
