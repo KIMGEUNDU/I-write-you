@@ -11,6 +11,8 @@ export const letterState = atom<LetterState>({
     writingPad: 0,
     member: false,
     attachment: false,
+    senderId: '',
+    receiverId: ''
   }
 });
 
