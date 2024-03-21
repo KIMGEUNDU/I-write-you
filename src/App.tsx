@@ -8,6 +8,8 @@ import { Suspense, useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import openRouter from './openRoutes';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -40,6 +42,7 @@ function App() {
           )}
         </Suspense>
       </HelmetProvider>
+      <ToastContainer />
     </RecoilRoot>
   );
 }
