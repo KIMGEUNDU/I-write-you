@@ -15,8 +15,7 @@ import {
 import { FiChevronLeft } from 'react-icons/fi';
 import { useRecoilState } from 'recoil';
 import { supabase } from '@/client';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import ShareModal from '@/components/ShareModal';
@@ -99,21 +98,12 @@ export default function WriteLetter() {
         }
 
         if (letter.member) {
-          toast.success('전달 성공!', {
-            position: 'top-center',
-            autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-          });
+          toast.success('전달 성공!');
 
           setTimeout(() => {
             navigate(`/sentRead/${data[0].id}`);
           }, 1002);
-        } else {
+        } else if (!letter.member) {
           setModal(true);
         }
       } else if (
@@ -139,37 +129,19 @@ export default function WriteLetter() {
         }
 
         if (letter.member) {
-          toast.success('전달 성공!', {
-            position: 'top-center',
-            autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-          });
+          toast.success('전달 성공!');
 
           setTimeout(() => {
             navigate(`/sentRead/${data[0].id}`);
           }, 1002);
-        } else {
+        } else if (!letter.member) {
           setModal(true);
         }
       }
     } catch (err) {
       console.error(err);
 
-      toast.warning('잠시후 다시 시도해주세요', {
-        position: 'top-center',
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      toast.warning('잠시후 다시 시도해주세요');
     }
   };
 
@@ -198,16 +170,7 @@ export default function WriteLetter() {
       if (letter.contents.length === 0) {
         setUpload(false);
 
-        toast.error('편지 내용을 작성해주세요', {
-          position: 'top-center',
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
+        toast.error('편지 내용을 작성해주세요');
       } else {
         uploadLetter();
         setUpload(false);
@@ -260,7 +223,6 @@ export default function WriteLetter() {
           <button type="submit" css={sendBtn}>
             전달
           </button>
-          <ToastContainer />
           <MenuButton />
         </section>
         {modal && <ShareModal letterId={letterId} />}
