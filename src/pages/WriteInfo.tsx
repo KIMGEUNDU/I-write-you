@@ -4,13 +4,13 @@ import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import { RiCheckboxBlankCircleFill } from 'react-icons/ri';
 import { RiCheckboxCircleFill } from 'react-icons/ri';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { letterState } from '@/recoil/atom/useLetter';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet-async';
 import { mq } from '@/style/mq';
+import { supabase } from '@/client';
 
 export default function WriteInfo() {
   const [select, setSelect] = useState(false);
@@ -19,12 +19,6 @@ export default function WriteInfo() {
   const [selectName, setSelectName] = useState('선택');
   const [letter, setLetter] = useRecoilState(letterState);
   const navigate = useNavigate();
-
-  /* 임시 로그인 */
-  const my = {
-    id: 1,
-    name: '윤동주이',
-  };
 
   /* 임시 회원 */
   const friend = [
@@ -105,82 +99,58 @@ export default function WriteInfo() {
   };
 
   /* 편지쓰기 */
-  const moveWriteLetter = () => {
-    if (letter.member) {
+  const moveWriteLetter = async () => {
+    const { data: senderHotel }: { data: UserInfo[] | null } = await supabase
+      .from('userInfo')
+      .select('*')
+      .eq('id', letter.senderId);
+
+    if (letter.member && senderHotel) {
       if (!letter.receiver) {
-        toast.error('친구 이름을 작성해주세요', {
-          position: 'top-center',
-          autoClose: 1500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
+        toast.error('친구 이름을 작성해주세요');
       } else {
         setLetter((prev) => ({
           ...prev,
-          sender: my.name,
+          sender: senderHotel[0].hotelName,
         }));
 
         navigate('/writeLetter');
       }
-    } else if (!letter.member) {
+    } else if (!letter.member && senderHotel) {
       if (!letter.receiver) {
-        toast.error('친구 이름을 작성해주세요', {
-          position: 'top-center',
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
+        toast.error('친구 이름을 작성해주세요');
       } else if (!letter.secretQuestion) {
-        toast.error('암호 질문을 작성해주세요', {
-          position: 'top-center',
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
+        toast.error('암호 질문을 작성해주세요');
       } else if (!letter.secretKey) {
-        toast.error('암호를 정해주세요', {
-          position: 'top-center',
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
+        toast.error('암호를 정해주세요');
       } else if (letter.secretKey.length !== 4) {
-        toast.error('암호는 4자리로 입력해주세요', {
-          position: 'top-center',
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
+        toast.error('암호는 4자리로 입력해주세요');
       } else {
         setLetter((prev) => ({
           ...prev,
-          sender: my.name,
+          sender: senderHotel[0].hotelName,
         }));
 
         navigate('/writeLetter');
       }
     }
   };
+
+  // 수신인 아이디 가져오기
+  useEffect(() => {
+    const loginUser = localStorage.getItem(
+      'sb-uwpomeczmzzpylcpjspx-auth-token'
+    );
+
+    if (loginUser) {
+      const loginUserId = JSON.parse(loginUser).user.id;
+
+      setLetter((prev) => ({
+        ...prev,
+        senderId: loginUserId,
+      }));
+    }
+  }, []);
 
   return (
     <>
@@ -297,7 +267,6 @@ export default function WriteInfo() {
         <button type="button" css={writeLetter} onClick={moveWriteLetter}>
           편지쓰기
         </button>
-        <ToastContainer />
       </section>
     </>
   );
