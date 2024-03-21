@@ -26,6 +26,7 @@ function MenuButton({
     if (error) {
       console.log('로그아웃 중 에러 발생: ', error.message);
     } else {
+      localStorage.removeItem('myInfo');
       navigate('/');
     }
   };
@@ -54,6 +55,11 @@ function MenuButton({
               </NavLink>
             </li>
           )}
+          <li>
+            <NavLink css={nav} to="/friend">
+              친구 목록
+            </NavLink>
+          </li>
           <li onClick={handleLogout} css={css({ cursor: 'pointer' })}>
             체크아웃
           </li>
