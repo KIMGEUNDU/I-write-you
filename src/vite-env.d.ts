@@ -11,6 +11,16 @@ interface LetterState {
   writingPad: number;
   member: boolean;
   attachment: boolean;
+  receiverId: string;
+  senderId: string;
+}
+
+interface UserInfo {
+  id: string;
+  userEmail: string;
+  userId: string;
+  hotelName: string;
+  created_at: string;
 }
 
 interface Window {
@@ -22,4 +32,12 @@ interface Window {
 type infoType = {
   id: string;
   email: string;
+};
+
+type friendData = {
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  receiverName: string;
+  status: boolean;
 };
