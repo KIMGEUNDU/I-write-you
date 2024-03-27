@@ -117,10 +117,10 @@ export default function Hotel() {
                 src={v === 0 ? `${empty}` : v === 1 ? `${newMail}` : `${view}`}
                 alt={
                   v === 0
-                    ? '미확인 편지'
+                    ? '미확인 편지' // 0
                     : v === 1
-                    ? '새로운 편지'
-                    : '확인 편지'
+                    ? '새로운 편지' // 1
+                    : '확인 편지' // 2
                 }
                 link={
                   v === 0
