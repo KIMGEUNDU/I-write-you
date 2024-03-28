@@ -9,7 +9,7 @@ function Mail({
   alt,
   link,
 }: {
-  mail: number;
+  mail: boolean;
   src: string;
   alt: string;
   link: string;
@@ -25,8 +25,10 @@ function Mail({
     background: 'transparent',
     margin: '0 13.4px',
     padding: 0,
-    cursor: mail === 0 ? 'default;' : 'pointer',
-    '&:hover': css({ transform: mail === 0 ? 'scale(100%)' : 'scale(120%)' }),
+    cursor: mail ? 'default;' : 'pointer',
+    '&:hover': css({
+      transform: mail ? 'scale(100%)' : 'scale(120%)',
+    }),
   });
 
   return (
