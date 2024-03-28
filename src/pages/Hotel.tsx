@@ -16,27 +16,42 @@ import view from '/viewMail.png';
 import EventControl from '@/components/EventControl';
 import { supabase } from '@/supabaseClient';
 import { User } from '@supabase/supabase-js';
+import LetterPagination from '@/components/LetterPagination';
+
+interface letterType {
+  id: number;
+  created_at: string;
+  receiverId: string | null;
+  read: boolean;
+}
 
 export default function Hotel() {
   const navigate = useNavigate();
   const [season, setSeason] = useState('');
   const [control, setControl] = useState(false);
-  const [, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [hotelName, setHotelName] = useState('');
+  const [letterData, setLetterData] = useState<letterType[] | null>(null);
+  const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
+
+  // 페이지네이션
+  const [limit] = useState(28);
+  const [page, setPage] = useState(1);
+  const offset = (page - 1) * limit;
 
   useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error('Error fetching user: ', error);
+      } else if (data) {
+        fetchHotelName(data.user);
+        setUser(data.user);
+      }
+    };
+
     fetchUser();
   }, []);
-
-  const fetchUser = async () => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) {
-      console.error('Error fetching user: ', error);
-    } else if (data) {
-      setUser(data.user);
-      fetchHotelName(data.user);
-    }
-  };
 
   const fetchHotelName = async (user: User) => {
     if (user) {
@@ -59,10 +74,49 @@ export default function Hotel() {
     }
   };
 
-  /* 임시배열 */
-  const arr = [
-    0, 0, 0, 1, 0, 1, 0, 2, 1, 2, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  ];
+  // fetchLetterData
+  useEffect(() => {
+    const fetchLetterData = async (user: User) => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('letter')
+          .select('id, created_at, receiverId, read')
+          .eq('receiverId', user.id);
+
+        if (!data) {
+          navigate('/myProfile');
+          return;
+        }
+
+        if (error) {
+          console.error('Error fetching hotel data: ', error);
+        } else if (data) {
+          data.sort(
+            (a, b) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+          );
+          setLetterData(data);
+        }
+      }
+    };
+
+    if (user) {
+      fetchLetterData(user);
+    }
+  }, [user, setUser]);
+
+  // 페이지네이션
+  useEffect(() => {
+    if (letterData && letterData?.length % limit != 0) {
+      const emptyData = Array(limit - (letterData!.length % limit))
+        .fill(0)
+        .map((v, i) => v + i);
+      setEmptyData(emptyData);
+    }
+  }, [letterData, setLetterData, limit]);
+
+  const numPages = letterData && Math.ceil(letterData!.length / limit);
 
   /* 현재 달 */
   const currentMonth = () => {
@@ -110,29 +164,38 @@ export default function Hotel() {
       </button>
       <div css={hotelWrapper}>
         <ul css={mailWrapper}>
-          {arr.map((v, i) => (
-            <li key={i}>
+          {letterData?.slice(offset, offset + limit).map((letter) => (
+            <li key={letter.id}>
               <Mail
-                mail={v}
-                src={v === 0 ? `${empty}` : v === 1 ? `${newMail}` : `${view}`}
+                mail={Number.isSafeInteger(letter.read)}
+                src={letter.read ? `${view}` : `${newMail}`}
                 alt={
-                  v === 0
-                    ? '미확인 편지'
-                    : v === 1
-                    ? '새로운 편지'
-                    : '확인 편지'
+                  !letter.read
+                    ? '새로운 편지' // 1 -> 0
+                    : '확인 편지' // 2 -> 1
                 }
-                link={
-                  v === 0
-                    ? '/hotel'
-                    : v === 1
-                    ? '/receivedRead/1'
-                    : '/receivedRead/1'
-                }
+                link={`/receivedRead/${letter.id}`}
               />
             </li>
           ))}
+          {page === numPages &&
+            emptyData!.length > 0 &&
+            emptyData!.map((_, index) => (
+              <li key={index}>
+                <Mail mail={true} src={empty} alt="미확인 편지" link="/hotel" />
+              </li>
+            ))}
           <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
+          {page > 1 && (
+            <footer css={footerlayout}>
+              <LetterPagination
+                total={letterData?.length}
+                limit={limit}
+                page={page}
+                setPage={setPage}
+              />
+            </footer>
+          )}
         </ul>
       </div>
       <MenuButton home={true} />
@@ -271,4 +334,8 @@ const hotelNameWrapper = css({
   fontSize: '30px',
   color: '#452E72',
   fontFamily: 'InkLipquid',
+});
+
+const footerlayout = css({
+  width: '100%',
 });
