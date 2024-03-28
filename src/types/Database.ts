@@ -14,6 +14,9 @@ export interface Database {
           attachment: boolean | null;
           contents: string[] | null;
           sender: string | null;
+          senderId: string | null;
+          receiverId: string | null;
+          read: boolean;
         };
         Insert: {
           // the data to be passed to .insert()
@@ -27,6 +30,9 @@ export interface Database {
           attachment?: boolean | null;
           contents?: string[] | null;
           sender?: string | null;
+          senderId?: string | null;
+          receiverId?: string | null;
+          read?: boolean;
         };
         Update: {
           // the data to be passed to .update()
@@ -40,6 +46,9 @@ export interface Database {
           attachment?: boolean | null;
           contents?: string[] | null;
           sender?: string | null;
+          senderId?: string | null;
+          receiverId?: string | null;
+          read?: boolean;
         };
         Relationships: [];
       };
