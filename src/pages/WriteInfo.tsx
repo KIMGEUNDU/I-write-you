@@ -1,32 +1,34 @@
 /** @jsxImportSource @emotion/react */
-import { Common } from '@/style/Common';
-import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
-import { RiCheckboxBlankCircleFill } from 'react-icons/ri';
-import { RiCheckboxCircleFill } from 'react-icons/ri';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { letterState } from '@/recoil/atom/useLetter';
-import { toast } from 'react-toastify';
-import { Helmet } from 'react-helmet-async';
-import { mq } from '@/style/mq';
 import { supabase } from '@/client';
+import MenuButton from '@/components/MenuButton';
+import { myInfoState } from '@/recoil/atom/useFriend';
+import { letterState } from '@/recoil/atom/useLetter';
+import { Common } from '@/style/Common';
+import { mq } from '@/style/mq';
+import { css } from '@emotion/react';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import {
+  RiCheckboxBlankCircleFill,
+  RiCheckboxCircleFill,
+} from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useRecoilState } from 'recoil';
 
 export default function WriteInfo() {
   const [select, setSelect] = useState(false);
   const [memberCheck, setMemberCheck] = useState(false);
   const [nonMemberCheck, setNonMemberCheck] = useState(false);
   const [selectName, setSelectName] = useState('선택');
+  const [friendList, setFriendList] = useState<FriendList[]>([]);
   const [letter, setLetter] = useRecoilState(letterState);
+  const [myInfo] = useRecoilState(myInfoState);
   const navigate = useNavigate();
 
-  /* 임시 회원 */
-  const friend = [
-    { hotel: '어발동', memberName: '이동호' },
-    { hotel: '폭주기건차', memberName: '김건주' },
-    { hotel: '효그린', memberName: '장효윤' },
-    { hotel: '오소이', memberName: '정소이' },
-  ];
+  /* 중복없는 친구 목록 */
+  const unique = new Map(friendList.map((v) => [v.freindId, v]));
+  const uniqueFriendList = Array.from(unique.values());
 
   /* 팔로우 선택 */
   const selectMember = () => {
@@ -45,12 +47,13 @@ export default function WriteInfo() {
   };
 
   /* 팔로우 친구이름 */
-  const selectOption = (member: string) => {
+  const selectOption = (member: string, id: string) => {
     setSelect(false);
     setSelectName(member);
     setLetter((prev) => ({
       ...prev,
       receiver: member,
+      receiverId: id,
     }));
   };
 
@@ -136,20 +139,54 @@ export default function WriteInfo() {
     }
   };
 
-  // 수신인 아이디 가져오기
+  // 친구 목록 가져오기
   useEffect(() => {
-    const loginUser = localStorage.getItem(
-      'sb-uwpomeczmzzpylcpjspx-auth-token'
-    );
+    const fetchFriendList = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('friends')
+          .select('*')
+          // senderId가 MyInfo.id와 일치하고 status가 true인 조건
+          // 또는 receiveId가 MyInfo.id와 일치하고 status가 true인 조건
+          .or(`senderId.eq.${myInfo.id},receiverId.eq.${myInfo.id}`)
+          .or('status.eq.true');
+        if (error) {
+          console.error('Error fetching friends:', error);
+        } else {
+          // 팔로우목록 만들기
+          data.forEach((v) => {
+            if (v.senderId === myInfo.id) {
+              setFriendList((prev) => [
+                ...prev,
+                {
+                  freindId: v.receiverId,
+                  freindName: v.receiverName,
+                },
+              ]);
+            } else if (v.receiverId === myInfo.id) {
+              setFriendList((prev) => [
+                ...prev,
+                {
+                  freindId: v.senderId,
+                  freindName: v.senderName,
+                },
+              ]);
+            }
+          });
 
-    if (loginUser) {
-      const loginUserId = JSON.parse(loginUser).user.id;
+          // sender 데이터 추가
+          setLetter((prev) => ({
+            ...prev,
+            senderId: myInfo.id,
+            sender: myInfo.email,
+          }));
+        }
+      } catch (error) {
+        console.error('Unexpected error:', error);
+      }
+    };
 
-      setLetter((prev) => ({
-        ...prev,
-        senderId: loginUserId,
-      }));
-    }
+    fetchFriendList();
   }, []);
 
   return (
@@ -186,14 +223,14 @@ export default function WriteInfo() {
                 </button>
                 {select && (
                   <ul css={memberOptionList}>
-                    {friend.map((v, i) => (
+                    {uniqueFriendList.map((v, i) => (
                       <li css={memberOptionItem} key={i}>
                         <button
                           type="button"
                           css={optionItem}
-                          onClick={() => selectOption(v.memberName)}
+                          onClick={() => selectOption(v.freindName, v.freindId)}
                         >
-                          {v.hotel} &#40;{v.memberName}&#41;
+                          {v.freindName}
                         </button>
                       </li>
                     ))}
@@ -267,6 +304,7 @@ export default function WriteInfo() {
         <button type="button" css={writeLetter} onClick={moveWriteLetter}>
           편지쓰기
         </button>
+        <MenuButton />
       </section>
     </>
   );
