@@ -12,7 +12,8 @@ export const letterState = atom<LetterState>({
     member: false,
     attachment: false,
     senderId: '',
-    receiverId: ''
+    receiverId: '',
+    read: false
   }
 });
 

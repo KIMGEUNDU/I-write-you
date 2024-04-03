@@ -13,6 +13,7 @@ interface LetterState {
   attachment: boolean;
   receiverId: string;
   senderId: string;
+  read: boolean;
 }
 
 interface UserInfo {
@@ -41,3 +42,8 @@ type friendData = {
   receiverName: string;
   status: boolean;
 };
+
+interface FriendList {
+  freindId: string;
+  freindName: string;
+}
