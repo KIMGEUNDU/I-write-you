@@ -10,6 +10,9 @@ import { css, keyframes } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import { BsFillSendFill } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { myInfoState } from '@/recoil/atom/useFriend';
+
 import empty from '/emptyMail.png';
 import newMail from '/newMail.png';
 import view from '/viewMail.png';
@@ -33,12 +36,14 @@ export default function Hotel() {
   const [hotelName, setHotelName] = useState('');
   const [letterData, setLetterData] = useState<letterType[] | null>(null);
   const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
+  const [, setMyInfo] = useRecoilState(myInfoState);
 
   // 페이지네이션
   const [limit] = useState(28);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
+  // TODO: 로직정리
   useEffect(() => {
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -74,7 +79,44 @@ export default function Hotel() {
     }
   };
 
-  // fetchLetterData
+  useEffect(() => {
+    const findAndFetchMyId = async () => {
+      try {
+        // 사용자 기본 정보를 불러옵니다.
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          // userId를 이용해 추가 정보를 조회합니다.
+          const { data: userInfo, error } = await supabase
+            .from('userInfo')
+            .select('*')
+            .eq('userId', user.id);
+
+          // 에러가 없으면 상태를 한 번만 업데이트합니다.
+          if (!error && userInfo.length > 0) {
+            // 사용자 정보와 추가 정보 모두를 상태에 설정합니다.
+            setMyInfo({ id: user.id, email: userInfo[0].hotelName });
+            //localStorage에 나의 정보 담기
+            localStorage.setItem(
+              'myInfo',
+              JSON.stringify({ id: user.id, email: userInfo[0].hotelName })
+            );
+          } else {
+            // userInfo가 비어있거나 오류가 발생한 경우, 사용자 기본 정보만으로 상태를 업데이트합니다.
+            setMyInfo({ id: user.id, email: '' });
+          }
+        }
+      } catch (error) {
+        console.log('Error fetching user info: ', error);
+      }
+    };
+
+    findAndFetchMyId();
+  });
+
+  // 편지 데이터 fetch
   useEffect(() => {
     const fetchLetterData = async (user: User) => {
       if (user) {
@@ -97,6 +139,7 @@ export default function Hotel() {
               new Date(a.created_at).getTime()
           );
           setLetterData(data);
+          console.log(data);
         }
       }
     };
@@ -106,8 +149,15 @@ export default function Hotel() {
     }
   }, [user, setUser]);
 
-  // 페이지네이션
+  // TODO: 페이지네이션 - case 분리
   useEffect(() => {
+    if (letterData?.length === 0) {
+      const emptyData = Array(limit)
+        .fill(0)
+        .map((v, i) => v + i);
+      setEmptyData(emptyData);
+    }
+
     if (letterData && letterData?.length % limit != 0) {
       const emptyData = Array(limit - (letterData!.length % limit))
         .fill(0)
@@ -178,6 +228,7 @@ export default function Hotel() {
               />
             </li>
           ))}
+          {/* TODO: data [] case 분리 */}
           {page === numPages &&
             emptyData!.length > 0 &&
             emptyData!.map((_, index) => (

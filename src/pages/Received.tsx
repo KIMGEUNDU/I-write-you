@@ -18,6 +18,7 @@ type ReceivedItemProp = {
 };
 
 export default function Received() {
+  // TODO: const [user, setUser] = useState<User | null>(null);
   const [receivedData, setReceivedData] = useState<ReceivedItemProp[] | null>(
     null
   );
@@ -25,7 +26,7 @@ export default function Received() {
   const [hover, setHover] = useState<number | null>(null);
 
   // 페이지네이션
-  const [limit] = useState(8);
+  const [limit] = useState(12);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
@@ -35,7 +36,7 @@ export default function Received() {
         const { data } = await supabase
           .from('letter')
           .select('id, created_at, receiver');
-        // filter: 로그인 - sender 일치할 경우만
+        // TODO: filter: 로그인 - sender 일치할 경우만
         setReceivedData(
           data!.sort(
             (a, b) =>
@@ -115,14 +116,16 @@ export default function Received() {
       </div>
       <img src="/mailMan.png" alt="배달원" css={frontMan} />
       <MenuButton sent />
-      <footer css={footerlayout}>
-        <LetterPagination
-          total={receivedData?.length}
-          limit={limit}
-          page={page}
-          setPage={setPage}
-        />
-      </footer>
+      {page > 1 && (
+        <footer css={footerlayout}>
+          <LetterPagination
+            total={receivedData?.length}
+            limit={limit}
+            page={page}
+            setPage={setPage}
+          />
+        </footer>
+      )}
     </section>
   );
 }
