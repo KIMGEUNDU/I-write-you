@@ -1,15 +1,17 @@
 /** @jsxImportSource @emotion/react */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import { supabase } from '@/client';
 import { css, keyframes } from '@emotion/react';
 
+import LetterPagination from '@/components/LetterPagination';
 import MenuButton from '@/components/MenuButton';
+import { myInfoState } from '@/recoil/atom/useFriend';
 import { debounce } from '@/util/debounce';
 import { letterSentRecent } from '@/util/letterSentRecent';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
-import LetterPagination from '@/components/LetterPagination';
 
 type SentItemProp = {
   id: number;
@@ -18,7 +20,7 @@ type SentItemProp = {
 };
 
 export default function Sent() {
-  // TODO: const [user, setUser] = useState<User | null>(null);
+  const [myInfo] = useRecoilState(myInfoState);
   const [sentData, setSentData] = useState<SentItemProp[] | null>(null);
   const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
   const [hover, setHover] = useState<number | null>(null);
@@ -33,21 +35,23 @@ export default function Sent() {
       try {
         const { data } = await supabase
           .from('letter')
-          .select('id, created_at, sender');
-        // TODO: filter: 로그인 - receiver 일치할 경우만
-        setSentData(
-          data!.sort(
+          .select('id, created_at, sender')
+          .eq('senderId', myInfo.id);
+
+        if (data) {
+          data.sort(
             (a, b) =>
               new Date(b.created_at).getTime() -
               new Date(a.created_at).getTime()
-          )
-        );
+          );
+          setSentData(data);
+        }
       } catch (error) {
         console.log(error);
       }
     };
     fetchSent();
-  }, []);
+  }, [myInfo]);
 
   useEffect(() => {
     if (sentData && sentData?.length % limit != 0) {
