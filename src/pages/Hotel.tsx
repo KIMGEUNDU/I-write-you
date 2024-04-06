@@ -183,26 +183,26 @@ export default function Hotel() {
           {page === numPages
             ? emptyData!.length > 0 &&
               emptyData!.map((_, index) => (
-                <li key={index}>
-                  <Mail
-                    mail={true}
-                    src={empty}
-                    alt="미확인 편지"
-                    link="/hotel"
-                  />
-                </li>
+                <Mail
+                  key={index}
+                  mail
+                  isEmpty
+                  src={empty}
+                  alt="미확인 편지"
+                  link="/hotel"
+                />
               ))
             : Array(limit)
                 .fill(0)
                 .map((_, index) => (
-                  <li key={index}>
-                    <Mail
-                      mail={true}
-                      src={empty}
-                      alt="미확인 편지"
-                      link="/hotel"
-                    />
-                  </li>
+                  <Mail
+                    key={index}
+                    mail
+                    isEmpty
+                    src={empty}
+                    alt="미확인 편지"
+                    link="/hotel"
+                  />
                 ))}
           <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
           {page > 1 && (
