@@ -109,15 +109,7 @@ export default function Hotel() {
     }
   }, [myInfo]);
 
-  // TODO: 페이지네이션 - case 분리
   useEffect(() => {
-    if (letterData?.length === 0) {
-      const emptyData = Array(limit)
-        .fill(0)
-        .map((v, i) => v + i);
-      setEmptyData(emptyData);
-    }
-
     if (letterData && letterData?.length % limit != 0) {
       const emptyData = Array(limit - (letterData!.length % limit))
         .fill(0)
@@ -188,14 +180,30 @@ export default function Hotel() {
               />
             </li>
           ))}
-          {/* TODO: data [] case 분리 */}
-          {page === numPages &&
-            emptyData!.length > 0 &&
-            emptyData!.map((_, index) => (
-              <li key={index}>
-                <Mail mail={true} src={empty} alt="미확인 편지" link="/hotel" />
-              </li>
-            ))}
+          {page === numPages
+            ? emptyData!.length > 0 &&
+              emptyData!.map((_, index) => (
+                <li key={index}>
+                  <Mail
+                    mail={true}
+                    src={empty}
+                    alt="미확인 편지"
+                    link="/hotel"
+                  />
+                </li>
+              ))
+            : Array(limit)
+                .fill(0)
+                .map((_, index) => (
+                  <li key={index}>
+                    <Mail
+                      mail={true}
+                      src={empty}
+                      alt="미확인 편지"
+                      link="/hotel"
+                    />
+                  </li>
+                ))}
           <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
           {page > 1 && (
             <footer css={footerlayout}>
