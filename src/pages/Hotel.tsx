@@ -37,7 +37,7 @@ export default function Hotel() {
   const [myInfo, setMyInfo] = useRecoilState(myInfoState);
 
   // 페이지네이션
-  const [limit] = useState(28);
+  const [limit] = useState(32);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
@@ -188,14 +188,30 @@ export default function Hotel() {
               />
             </li>
           ))}
-          {/* TODO: data [] case 분리 */}
-          {page === numPages &&
-            emptyData!.length > 0 &&
-            emptyData!.map((_, index) => (
-              <li key={index}>
-                <Mail mail={true} src={empty} alt="미확인 편지" link="/hotel" />
-              </li>
-            ))}
+          {page === numPages
+            ? emptyData!.length > 0 &&
+              emptyData!.map((_, index) => (
+                <li key={index}>
+                  <Mail
+                    mail={true}
+                    src={empty}
+                    alt="미확인 편지"
+                    link="/hotel"
+                  />
+                </li>
+              ))
+            : Array(limit)
+                .fill(0)
+                .map((_, index) => (
+                  <li key={index}>
+                    <Mail
+                      mail={true}
+                      src={empty}
+                      alt="미확인 편지"
+                      link="/hotel"
+                    />
+                  </li>
+                ))}
           <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
           {page > 1 && (
             <footer css={footerlayout}>
@@ -310,14 +326,14 @@ const hotelWrapper = css({
 
 const mailWrapper = mq({
   position: 'absolute',
-  top: '32%',
-  left: '50%',
+  top: '30.5%',
+  left: '50.2%',
   zIndex: '1',
   backgroundColor: 'black',
   opacity: '0.5',
   width: '100%',
-  minWidth: '476px',
-  maxWidth: '476px',
+  minWidth: '400px',
+  maxWidth: '400px',
   height: '41%',
   maxHeight: '41%',
   transform: 'translateX(-50%)',
@@ -325,17 +341,17 @@ const mailWrapper = mq({
   alignItems: 'flex-start',
   flexWrap: 'wrap',
 
-  '> :nth-of-type(1)': {
-    marginLeft: '7px',
-  },
+  // '> :nth-of-type(1)': {
+  //   marginLeft: '7px',
+  // },
 
-  '> :nth-of-type(8n+1)': {
-    marginLeft: '7px',
-  },
+  // '> :nth-of-type(8n+1)': {
+  //   marginLeft: '7px',
+  // },
 
-  '> :nth-of-type(8n)': {
-    marginRight: 0,
-  },
+  // '> :nth-of-type(8n)': {
+  //   marginRight: 0,
+  // },
 });
 
 const hotelNameWrapper = css({
