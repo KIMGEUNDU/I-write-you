@@ -176,7 +176,7 @@ export default function Hotel() {
                     ? '새로운 편지' // 1 -> 0
                     : '확인 편지' // 2 -> 1
                 }
-                link={`/receivedRead/${letter.id}`}
+                link={`/read/${letter.id}`}
               />
             </li>
           ))}
