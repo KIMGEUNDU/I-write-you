@@ -25,7 +25,7 @@ function Mail({
     height: '18%',
     border: 'none',
     background: 'transparent',
-    margin: '0 13.4px',
+    margin: '1px 7.5px',
     padding: 0,
     cursor: mail ? 'default;' : 'pointer',
     '&:hover': css({

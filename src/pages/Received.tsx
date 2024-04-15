@@ -99,7 +99,7 @@ export default function Received() {
                 <div css={namePlateLine} aria-hidden />
                 <Link
                   css={letterBox}
-                  to={`/receivedRead/${item.id}`}
+                  to={`/read/${item.id}`}
                   aria-label="받는 편지함"
                 >
                   <img css={animationStyle} src="/gift.png" alt="선물" />

@@ -93,10 +93,10 @@ export default function Sent() {
               <div css={namePlateLine} aria-hidden />
               <Link
                 css={letterBox}
-                to={`/sentRead/${item.id}`}
+                to={`/read/${item.id}`}
                 aria-label="보낸 편지함"
               >
-                <img css={animationStyle} src="/key.png" alt="키" />
+                <img css={animationStyle} src="/key.png" alt="열쇠" />
               </Link>
             </div>
           );
