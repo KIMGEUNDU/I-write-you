@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Mail({
   mail,
+  isEmpty = false,
   src,
   alt,
   link,
@@ -13,6 +14,7 @@ function Mail({
   src: string;
   alt: string;
   link: string;
+  isEmpty?: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -30,6 +32,14 @@ function Mail({
       transform: mail ? 'scale(100%)' : 'scale(120%)',
     }),
   });
+
+  if (isEmpty) {
+    return (
+      <li css={mailButton}>
+        <img css={{ width: '100%', height: 'auto' }} src={src} alt={alt} />
+      </li>
+    );
+  }
 
   return (
     <button css={mailButton} type="button" onClick={() => navigate(link)}>
