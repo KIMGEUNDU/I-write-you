@@ -92,12 +92,14 @@ export default function Read() {
       </h1>
       <header css={head}>
         <h3 css={font}>{letter?.sender}님으로부터</h3>
-        <img
-          css={giftImg(isSent)}
-          src={isSent ? '/key.png' : '/gift.png'}
-          alt={isSent ? '열쇠' : '선물'}
-          aria-hidden={true}
-        />
+        <Link to={isSent ? '/sent' : '/received'}>
+          <img
+            css={giftImg}
+            src={isSent ? '/key.png' : '/gift.png'}
+            alt={isSent ? '열쇠' : '선물'}
+            aria-hidden={true}
+          />
+        </Link>
         {!isSent && (
           <Link css={button} to="/writeLetter">
             답장하기
@@ -105,16 +107,18 @@ export default function Read() {
         )}
       </header>
       <section css={letterWrapper(letter?.writingPad || 0)}>
-        <div css={contents}>
+        <div css={contentsWrapper}>
           {letter?.attachment && (
             <img css={attachment} src={attachmentUrl} alt="첨부파일" />
           )}
-          <p css={receiver}>{letter?.receiver}에게</p>
-          {letter?.contents.map((str, index) => (
-            <span css={line} key={index}>
-              {str}
-            </span>
-          ))}
+          <div css={contents}>
+            <p css={receiver}>{letter?.receiver}에게</p>
+            {letter?.contents.map((str, index) => (
+              <span css={line} key={index}>
+                {str}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
       <MenuButton />
@@ -148,15 +152,14 @@ const font = css({
   fontFamily: 'GowunBatang-Regular',
 });
 
-const giftImg = (isSent: boolean) =>
-  mq({
-    position: 'absolute',
-    top: ['-40%', '-50%', '-50%', '-50%'],
-    left: `${isSent ? '48%' : '51%'}`,
-    transform: 'translate(-50% -50%)',
-    width: ['30px', '40px', '40px', '40px'],
-    height: 'auto',
-  });
+const giftImg = mq({
+  position: 'absolute',
+  top: ['-40%', '-50%', '-50%', '-50%'],
+  left: '48%',
+  transform: 'translate(-50% -50%)',
+  width: ['30px', '40px', '40px', '40px'],
+  height: 'auto',
+});
 
 const button = css(font, {
   fontSize: '18px',
@@ -175,9 +178,7 @@ const letterWrapper = (index: number) =>
     overflowY: 'auto',
   });
 
-const receiver = css({ textAlign: 'left', width: '100%', fontSize: '30px' });
-
-const contents = css({
+const contentsWrapper = css({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -185,7 +186,6 @@ const contents = css({
   width: '100%',
   height: '100%',
   padding: '20px 30px',
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
   fontFamily: 'GangwonEduHyeonokT_OTFMediumA',
   fontSize: '20px',
 });
@@ -197,6 +197,12 @@ const attachment = css({
   maxHeight: '500px',
   padding: '20px 0',
 });
+
+const contents = css(contentsWrapper, {
+  background: 'rgba(255, 255, 255, 0.7)',
+});
+
+const receiver = css({ textAlign: 'left', width: '100%', fontSize: '30px' });
 
 const line = css({
   display: 'inline-block',
