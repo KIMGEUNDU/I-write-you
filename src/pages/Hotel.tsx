@@ -10,12 +10,14 @@ import { css, keyframes } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import { BsFillSendFill } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { myInfoState } from '@/recoil/atom/useFriend';
+
 import empty from '/emptyMail.png';
 import newMail from '/newMail.png';
 import view from '/viewMail.png';
 import EventControl from '@/components/EventControl';
 import { supabase } from '@/supabaseClient';
-import { User } from '@supabase/supabase-js';
 import LetterPagination from '@/components/LetterPagination';
 
 interface letterType {
@@ -29,68 +31,68 @@ export default function Hotel() {
   const navigate = useNavigate();
   const [season, setSeason] = useState('');
   const [control, setControl] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [hotelName, setHotelName] = useState('');
   const [letterData, setLetterData] = useState<letterType[] | null>(null);
   const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
+  const [myInfo, setMyInfo] = useRecoilState(myInfoState);
 
   // 페이지네이션
   const [limit] = useState(28);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
+  // fetch User Data
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error('Error fetching user: ', error);
-      } else if (data) {
-        fetchHotelName(data.user);
-        setUser(data.user);
-      }
-    };
+    const findAndFetchMyId = async () => {
+      try {
+        // 사용자 기본 정보를 불러옵니다.
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-    fetchUser();
-  }, []);
+        if (user) {
+          // userId를 이용해 추가 정보를 조회합니다.
+          const { data: userInfo, error } = await supabase
+            .from('userInfo')
+            .select('*')
+            .eq('userId', user.id);
 
-  const fetchHotelName = async (user: User) => {
-    if (user) {
-      const { data, error } = await supabase
-        .from('userInfo')
-        .select('hotelName')
-        .eq('id', user.id)
-        .single();
-
-      if (!data) {
-        navigate('/myProfile');
-        return;
-      }
-
-      if (error) {
-        console.error('Error fetching hotel name: ', error);
-      } else if (data) {
-        setHotelName(data.hotelName);
-      }
-    }
-  };
-
-  // fetchLetterData
-  useEffect(() => {
-    const fetchLetterData = async (user: User) => {
-      if (user) {
-        const { data, error } = await supabase
-          .from('letter')
-          .select('id, created_at, receiverId, read')
-          .eq('receiverId', user.id);
-
-        if (!data) {
+          // 에러가 없으면 상태를 한 번만 업데이트합니다.
+          if (!error && userInfo.length > 0) {
+            // 사용자 정보와 추가 정보 모두를 상태에 설정합니다.
+            setMyInfo({ id: user.id, email: userInfo[0].hotelName });
+            //localStorage에 나의 정보 담기
+            localStorage.setItem(
+              'myInfo',
+              JSON.stringify({ id: user.id, email: userInfo[0].hotelName })
+            );
+            // 호텔이름 state 저장
+            setHotelName(userInfo[0].hotelName);
+          } else {
+            // userInfo가 비어있거나 오류가 발생한 경우, 사용자 기본 정보만으로 상태를 업데이트합니다.
+            setMyInfo({ id: user.id, email: '' });
+          }
+        } else {
           navigate('/myProfile');
           return;
         }
+      } catch (error) {
+        console.log('Error fetching user info: ', error);
+      }
+    };
+    findAndFetchMyId();
+  }, []);
 
-        if (error) {
-          console.error('Error fetching hotel data: ', error);
-        } else if (data) {
+  // fetch Letter Data
+  useEffect(() => {
+    const fetchLetterData = async () => {
+      try {
+        const { data } = await supabase
+          .from('letter')
+          .select('id, created_at, receiverId, read')
+          .eq('receiverId', myInfo.id);
+
+        if (data) {
           data.sort(
             (a, b) =>
               new Date(b.created_at).getTime() -
@@ -98,16 +100,24 @@ export default function Hotel() {
           );
           setLetterData(data);
         }
+      } catch (error) {
+        console.error('Error fetching hotel data: ', error);
       }
     };
-
-    if (user) {
-      fetchLetterData(user);
+    if (myInfo.id) {
+      fetchLetterData();
     }
-  }, [user, setUser]);
+  }, [myInfo]);
 
-  // 페이지네이션
+  // TODO: 페이지네이션 - case 분리
   useEffect(() => {
+    if (letterData?.length === 0) {
+      const emptyData = Array(limit)
+        .fill(0)
+        .map((v, i) => v + i);
+      setEmptyData(emptyData);
+    }
+
     if (letterData && letterData?.length % limit != 0) {
       const emptyData = Array(limit - (letterData!.length % limit))
         .fill(0)
@@ -178,6 +188,7 @@ export default function Hotel() {
               />
             </li>
           ))}
+          {/* TODO: data [] case 분리 */}
           {page === numPages &&
             emptyData!.length > 0 &&
             emptyData!.map((_, index) => (

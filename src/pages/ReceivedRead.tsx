@@ -10,16 +10,18 @@ export default function ReceivedRead() {
   useEffect(() => {
     const updateLetterRead = async () => {
       // 이미 true인 경우 update X
-      const { data, error } = await supabase
-        .from('letter')
-        .update({ read: true })
-        .eq('id', paramsId);
+      if (paramsId) {
+        const { data, error } = await supabase
+          .from('letter')
+          .update({ read: true })
+          .eq('id', paramsId.id);
 
-      if (error) {
-        console.error('Error updating letter read: ', error);
+        if (error) {
+          console.error('Error updating letter read: ', error);
+        }
+        
+        return data;
       }
-
-      return data;
     };
 
     updateLetterRead();
