@@ -5,7 +5,7 @@ export const letterState = atom<LetterState>({
   default: {
     sender: '',
     receiver: '',
-    contents: [],
+    contents: '',
     secretQuestion: '',
     secretKey: '',
     writingPad: 0,
