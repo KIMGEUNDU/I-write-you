@@ -90,9 +90,9 @@ export default function FriendReceived() {
             request.receiverId !== value.receiverId
         )
       );
-      console.log('친구거절 성공:', data);
+      console.log('친구 거절 성공:', data);
     } catch (error) {
-      console.error('친구거절 중 오류 발생:', error);
+      console.error('친구 거절 중 오류 발생:', error);
     }
   };
 

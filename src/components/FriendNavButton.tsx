@@ -17,7 +17,9 @@ export default function FriendNavButton({
 }) {
   return (
     <li key={index} css={NavButton({ value, state })}>
-      <button onClick={onClick}>{value}</button>
+      <button onClick={onClick} css={btn}>
+        {value}
+      </button>
     </li>
   );
 }
@@ -53,4 +55,8 @@ export const NavButton = ({
       width: '100%',
     })};
   }
+`;
+
+const btn = css`
+  cursor: pointer;
 `;

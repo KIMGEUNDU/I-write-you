@@ -9,6 +9,7 @@ export const myInfoState = atom<infoType>({
   key: 'myInfo',
   default: {
     id: '',
+    name: '',
     email: '',
   },
 });

@@ -24,7 +24,7 @@ function NotFound() {
         <p css={guide}>페이지를 찾을 수 없습니다</p>
         <span>올바른 URL을 입력하였는지 확인해주세요</span>
         <button css={back} type="button" onClick={() => navigate(-1)}>
-          이전페이지로 돌아가기
+          이전 페이지로 돌아가기
         </button>
       </div>
     </>
