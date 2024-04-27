@@ -42,7 +42,7 @@ export default function WriteInfo() {
       receiver: '',
       secretQuestion: '',
       secretKey: '',
-      contents: [],
+      contents: '',
     }));
   };
 
@@ -67,7 +67,7 @@ export default function WriteInfo() {
       ...prev,
       member: false,
       receiver: '',
-      contents: [],
+      contents: '',
     }));
   };
 
@@ -103,23 +103,13 @@ export default function WriteInfo() {
 
   /* 편지쓰기 */
   const moveWriteLetter = async () => {
-    const { data: senderHotel }: { data: UserInfo[] | null } = await supabase
-      .from('userInfo')
-      .select('*')
-      .eq('id', letter.senderId);
-
-    if (letter.member && senderHotel) {
+    if (letter.member) {
       if (!letter.receiver) {
         toast.error('친구 이름을 작성해주세요');
       } else {
-        setLetter((prev) => ({
-          ...prev,
-          sender: senderHotel[0].hotelName,
-        }));
-
         navigate('/writeLetter');
       }
-    } else if (!letter.member && senderHotel) {
+    } else if (!letter.member) {
       if (!letter.receiver) {
         toast.error('친구 이름을 작성해주세요');
       } else if (!letter.secretQuestion) {
@@ -129,11 +119,6 @@ export default function WriteInfo() {
       } else if (letter.secretKey.length !== 4) {
         toast.error('암호는 4자리로 입력해주세요');
       } else {
-        setLetter((prev) => ({
-          ...prev,
-          sender: senderHotel[0].hotelName,
-        }));
-
         navigate('/writeLetter');
       }
     }
@@ -153,6 +138,7 @@ export default function WriteInfo() {
         if (error) {
           console.error('Error fetching friends:', error);
         } else {
+          console.log(data);
           // 팔로우목록 만들기
           data.forEach((v) => {
             if (v.senderId === myInfo.id) {
@@ -223,17 +209,23 @@ export default function WriteInfo() {
                 </button>
                 {select && (
                   <ul css={memberOptionList}>
-                    {uniqueFriendList.map((v, i) => (
-                      <li css={memberOptionItem} key={i}>
-                        <button
-                          type="button"
-                          css={optionItem}
-                          onClick={() => selectOption(v.freindName, v.freindId)}
-                        >
-                          {v.freindName}
-                        </button>
-                      </li>
-                    ))}
+                    {uniqueFriendList.length > 0 &&
+                      uniqueFriendList.map((v, i) => (
+                        <li css={memberOptionItem} key={i}>
+                          <button
+                            type="button"
+                            css={optionItem}
+                            onClick={() =>
+                              selectOption(v.freindName, v.freindId)
+                            }
+                          >
+                            {v.freindName}
+                          </button>
+                        </li>
+                      ))}
+                    {uniqueFriendList.length === 0 && (
+                      <li css={memberOptionItem}>팔로우 목록이 없습니다</li>
+                    )}
                   </ul>
                 )}
               </div>
