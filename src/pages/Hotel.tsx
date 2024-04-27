@@ -1,5 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { BsFillSendFill } from 'react-icons/bs';
 import Mail from '@/components/Mail';
 import MenuButton from '@/components/MenuButton';
 import SeasonEvent from '@/components/SeasonEvent';
@@ -7,9 +11,6 @@ import { Common } from '@/style/Common';
 import { mq } from '@/style/mq';
 import { randomColor, randomPosition } from '@/util/random';
 import { css, keyframes } from '@emotion/react';
-import { useEffect, useState } from 'react';
-import { BsFillSendFill } from 'react-icons/bs';
-import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { myInfoState } from '@/recoil/atom/useFriend';
 
@@ -57,6 +58,12 @@ export default function Hotel() {
             .select('*')
             .eq('userId', user.id);
 
+          if (userInfo && !userInfo[0].hotelName) {
+            toast.warn('호텔 이름을 설정해주세요.');
+            navigate('/myProfile');
+            return;
+          }
+
           // 에러가 없으면 상태를 한 번만 업데이트합니다.
           if (!error && userInfo.length > 0) {
             // 사용자 정보와 추가 정보 모두를 상태에 설정합니다.
@@ -72,9 +79,6 @@ export default function Hotel() {
             // userInfo가 비어있거나 오류가 발생한 경우, 사용자 기본 정보만으로 상태를 업데이트합니다.
             setMyInfo({ id: user.id, email: '' });
           }
-        } else {
-          navigate('/myProfile');
-          return;
         }
       } catch (error) {
         console.log('Error fetching user info: ', error);

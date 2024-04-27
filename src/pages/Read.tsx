@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { supabase } from '@/client';
 import { css } from '@emotion/react';
@@ -9,17 +9,18 @@ import { myInfoState } from '@/recoil/atom/useFriend';
 import MenuButton from '@/components/MenuButton';
 import { Common } from '@/style/Common';
 import { mq } from '@/style/mq';
-
-// http://localhost:5173/#/nonMember/61
-// s2.receiver: http://localhost:5173/#/Read/46
-// s2.sender: http://localhost:5173/#/Read/54
+import CryptoJS from 'crypto-js';
+import { letterState } from '@/recoil/atom/useLetter';
 
 export default function Read() {
+  const navigate = useNavigate();
   const [myInfo] = useRecoilState(myInfoState);
+  const [letter, setLetter] = useRecoilState(letterState);
   const { id } = useParams();
   4;
   const [isSent, SetIsSent] = useState(false);
-  const [letter, setLetter] = useState<LetterState | null>(null);
+  const [currentLetter, setCurrentLetter] = useState<LetterState | null>(null);
+  const [content, setContent] = useState('');
   const [attachmentUrl, setAttachmentUrl] = useState('');
 
   /* 데이터 가져오기 */
@@ -32,7 +33,15 @@ export default function Read() {
           .eq('id', `${id}`);
 
         if (letterData) {
-          setLetter(letterData[0]);
+          setCurrentLetter(letterData[0]);
+
+          const bytes = CryptoJS.AES.decrypt(
+            letterData[0].contents,
+            import.meta.env.VITE_CRYPTO_KEY
+          );
+          const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+          setContent(decryptedData);
 
           if (letterData[0].attachment) {
             const imgUrl = await supabase.storage
@@ -52,7 +61,7 @@ export default function Read() {
 
   /* 읽은 편지 업데이트 */
   useEffect(() => {
-    if (!letter?.read)
+    if (!currentLetter?.read)
       (async () => {
         try {
           if (id) {
@@ -62,20 +71,20 @@ export default function Read() {
               .eq('id', id);
 
             if (data) {
-              setLetter(data);
+              setCurrentLetter(data);
             }
           }
         } catch (error) {
           console.error('Error updating letter read: ', error);
         }
       })();
-  }, [letter, id]);
+  }, [currentLetter, id]);
 
   /* 받는 편지 여부 */
   useEffect(() => {
     if (
-      letter?.senderId === myInfo?.id ||
-      letter?.senderId === JSON.parse(localStorage.getItem('myInfo')!).id
+      currentLetter?.senderId === myInfo?.id ||
+      currentLetter?.senderId === JSON.parse(localStorage.getItem('myInfo')!).id
     ) {
       SetIsSent(true);
     }
@@ -83,7 +92,22 @@ export default function Read() {
     return () => {
       SetIsSent(false);
     };
-  }, [letter, myInfo]);
+  }, [currentLetter, myInfo]);
+
+  /* 답장 */
+  const reply = () => {
+    if (currentLetter) {
+      setLetter({
+        ...letter,
+        sender: currentLetter.receiver,
+        receiver: currentLetter.sender,
+        member: true,
+        senderId: currentLetter.receiverId,
+        receiverId: currentLetter.senderId,
+      });
+    }
+    return navigate('/writeLetter');
+  };
 
   return (
     <div css={background}>
@@ -91,7 +115,7 @@ export default function Read() {
         {isSent ? '보낸 편지 읽는 페이지' : '받은 편지 읽는 페이지'}
       </h1>
       <header css={head}>
-        <h3 css={font}>{letter?.sender}님으로부터</h3>
+        <h3 css={font}>{currentLetter?.sender}님으로부터</h3>
         <Link to={isSent ? '/sent' : '/received'}>
           <img
             css={giftImg}
@@ -101,27 +125,27 @@ export default function Read() {
           />
         </Link>
         {!isSent && (
-          <Link css={button} to="/writeLetter">
+          <button type="button" css={button} onClick={reply}>
             답장하기
-          </Link>
+          </button>
         )}
       </header>
-      <section css={letterWrapper(letter?.writingPad || 0)}>
+      <section css={letterWrapper(currentLetter?.writingPad || 0)}>
         <div css={contentsWrapper}>
-          {letter?.attachment && (
+          {currentLetter?.attachment && (
             <img css={attachment} src={attachmentUrl} alt="첨부파일" />
           )}
           <div css={contents}>
-            <p css={receiver}>{letter?.receiver}에게</p>
-            {letter?.contents.map((str, index) => (
+            <p css={receiver}>{currentLetter?.receiver}에게</p>
+            {content.split('\n').map((str, index) => (
               <span css={line} key={index}>
                 {str}
               </span>
             ))}
           </div>
         </div>
+        <MenuButton />
       </section>
-      <MenuButton />
     </div>
   );
 }
@@ -162,10 +186,12 @@ const giftImg = mq({
 });
 
 const button = css(font, {
+  backgroundColor: 'transparent',
+  border: 'none',
   fontSize: '18px',
   color: 'white',
   padding: '1px 6px 1px 0',
-  textDecoration: 'none',
+  cursor: 'pointer',
 });
 
 const letterWrapper = (index: number) =>
