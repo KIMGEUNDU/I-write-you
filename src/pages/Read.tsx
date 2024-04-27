@@ -13,11 +13,11 @@ import CryptoJS from 'crypto-js';
 import { letterState } from '@/recoil/atom/useLetter';
 
 export default function Read() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [myInfo] = useRecoilState(myInfoState);
   const [letter, setLetter] = useRecoilState(letterState);
-  const { id } = useParams();
-  4;
+
   const [isSent, SetIsSent] = useState(false);
   const [currentLetter, setCurrentLetter] = useState<LetterState | null>(null);
   const [content, setContent] = useState('');
@@ -44,9 +44,9 @@ export default function Read() {
           setContent(decryptedData);
 
           if (letterData[0].attachment) {
-            const imgUrl = await supabase.storage
-              .from('letter')
-              .getPublicUrl(`attachment/${id}.png`).data.publicUrl;
+            const imgUrl = `${
+              import.meta.env.VITE_SUPABASE_URL
+            }/storage/v1/object/public/letter/${id}`;
 
             setAttachmentUrl(imgUrl);
           }
