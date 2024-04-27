@@ -1,21 +1,20 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useRecoilState /* useSetRecoilState */ } from 'recoil';
 import { supabase } from '@/client';
 import { css } from '@emotion/react';
 import { myInfoState } from '@/recoil/atom/useFriend';
 import MenuButton from '@/components/MenuButton';
 import { Common } from '@/style/Common';
 import { mq } from '@/style/mq';
-
-// http://localhost:5173/#/nonMember/61
-// s2.receiver: http://localhost:5173/#/Read/46
-// s2.sender: http://localhost:5173/#/Read/54
+// import { letterState } from '@/recoil/atom/useLetter';
 
 export default function Read() {
+  const navigate = useNavigate();
   const [myInfo] = useRecoilState(myInfoState);
+  // const [letterState, setLetterState] = useRecoilState(letterState);
   const { id } = useParams();
   4;
   const [isSent, SetIsSent] = useState(false);
@@ -85,6 +84,11 @@ export default function Read() {
     };
   }, [letter, myInfo]);
 
+  /* TODO 답장: recoilState update 로직 추가 예정 */
+  const reply = () => {
+    navigate('/writeLetter');
+  };
+
   return (
     <div css={background}>
       <h1 css={srOnly}>
@@ -101,9 +105,9 @@ export default function Read() {
           />
         </Link>
         {!isSent && (
-          <Link css={button} to="/writeLetter">
+          <button type="button" css={button} onClick={reply}>
             답장하기
-          </Link>
+          </button>
         )}
       </header>
       <section css={letterWrapper(letter?.writingPad || 0)}>
@@ -120,8 +124,8 @@ export default function Read() {
             ))}
           </div>
         </div>
+        <MenuButton />
       </section>
-      <MenuButton />
     </div>
   );
 }
@@ -162,10 +166,12 @@ const giftImg = mq({
 });
 
 const button = css(font, {
+  backgroundColor: 'transparent',
+  border: 'none',
   fontSize: '18px',
   color: 'white',
   padding: '1px 6px 1px 0',
-  textDecoration: 'none',
+  cursor: 'pointer',
 });
 
 const letterWrapper = (index: number) =>
