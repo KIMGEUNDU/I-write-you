@@ -36,7 +36,10 @@ export default function Sent() {
         const { data } = await supabase
           .from('letter')
           .select('id, created_at, sender')
-          .eq('senderId', myInfo.id);
+          .eq(
+            'senderId',
+            myInfo.id || JSON.parse(localStorage.getItem('myInfo')!).id
+          );
 
         if (data) {
           data.sort(
@@ -142,8 +145,8 @@ const srOnly = css({
 const background = css({
   position: 'relative',
   width: '100%',
+  height: '100vh',
   background: `${Common.colors.brown}`,
-  margin: 'auto 0',
   paddingTop: '2rem',
   paddingBottom: '265px',
   overflow: 'hidden',

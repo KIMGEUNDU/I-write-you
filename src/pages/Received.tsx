@@ -38,7 +38,10 @@ export default function Received() {
         const { data } = await supabase
           .from('letter')
           .select('id, created_at, receiver')
-          .eq('receiverId', myInfo.id);
+          .eq(
+            'receiverId',
+            myInfo.id || JSON.parse(localStorage.getItem('myInfo')!).id
+          );
 
         if (data) {
           data.sort(
@@ -148,9 +151,8 @@ const srOnly = css({
 const background = css({
   position: 'relative',
   width: '100%',
-  height: 'auto',
+  height: '100vh',
   background: '#FFC7BA',
-  margin: 'auto 0',
   paddingTop: '2rem',
   paddingBottom: '16.25rem',
   overflow: 'hidden',
