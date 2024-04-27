@@ -1,31 +1,23 @@
 /** @jsxImportSource @emotion/react */
-
 import { css } from '@emotion/react';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
-
 import FriendButton from './FriendButton';
 import { SrOnlyStyle } from '@/pages/Login';
 import { FriendListItem, FriendListNumber } from './FriendList';
 import { FriendRequestBtnBox } from './FriendReceived';
 import { supabase } from '@/client';
-
 import { useRecoilState } from 'recoil';
-import { usersInfoState, myInfoState } from '@/recoil/atom/useFriend';
+import { myInfoState } from '@/recoil/atom/useFriend';
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function FriendRequestForm() {
-  // 본인 uuid 값와 email 값
+  const [searchTerm, setSearchTerm] = useState('');
   const [myInfo] = useRecoilState(myInfoState);
+  const [filterUserInfo, setFilterUsersInfo] = useState<infoType[]>([]);
+  const [fList, setFriendList] = useState<string[]>([]);
 
-  // 다른 사용자들 uuid 값와 email 값 리스트
-  const [usersInfo] = useRecoilState(usersInfoState);
-
-  // let filterUsersInfo: infoType[] = [];
-  const [filterUsersInfo, setFilterUsersInfo] = useState<infoType[]>([]);
-
-  //* 사용자들 정보에서 내정보 필터링
-  //TODO: 친구 요청 할때 이미 요청했거나, 친구인 사용자는 제외하기
   useEffect(() => {
     const fetchFriendList = async () => {
       try {
@@ -34,55 +26,80 @@ export default function FriendRequestForm() {
           .select('*')
           .or(`senderId.eq.${myInfo.id},receiverId.eq.${myInfo.id}`);
 
-        //친구 요청 할때 이미 요청했거나, 친구인 사용자
-        const friendList = data!.map((i) =>
-          i.senderId === myInfo.id ? i.receiverName : i.senderName
-        );
+        const friendList = data!.map((i) => {
+          return i.senderId === myInfo.id ? i.receiverName : i.senderName;
+        });
 
-        //*본인과 친구 요청 할때 이미 요청했거나, 친구인 사용자 필터링
-        setFilterUsersInfo(
-          usersInfo.filter(
-            (i) => i.id !== myInfo.id && !friendList.includes(i.email)
-          )
-        );
+        setFriendList(friendList);
       } catch (error) {
         console.error('Error fetching friends:', error);
       }
-      // setFilterUsersInfo((prev) => ({
-      //   prev.filter((i)=>{})})
     };
     fetchFriendList();
-  }, []);
+  }, [myInfo.id]);
 
-  //친구 요청 버튼
   const handleFriendRequest = useCallback(
     async (value: infoType) => {
-      const { data, error } = await supabase.from('friends').upsert([
+      const { error } = await supabase.from('friends').upsert([
         {
           senderId: myInfo.id,
           senderName: myInfo.email,
           receiverId: value.id,
-          receiverName: value.email,
+          receiverName: value.name,
           status: false,
         },
       ]);
       if (error) {
         console.error('업데이트 중 오류 발생: ', error);
       } else {
-        //TODO: 친구요청하면 리스트에서 바로 사라지게하기
-        // setFilterUsersInfo(
-        //   (prev) =>
-        // prev.filter(
-        //   (i) =>
-        //   i.senderId !== value.senderId ||
-        //   i.receiverId !== value.receiverId
-        // )
-        // );
-        console.log('업데이트 성공: ', data);
+        const filterUser = filterUserInfo.filter(
+          (user) => user.name !== value.name
+        );
+
+        setFilterUsersInfo(filterUser);
+
+        toast.success(`${value.name} 님에게 친구 신청이 완료되었습니다.`);
       }
     },
-    [myInfo.id, myInfo.email]
+    [myInfo.id, myInfo.email, filterUserInfo]
   );
+
+  const handleSearch = async () => {
+    if (searchTerm.trim() === '') {
+      toast.error('검색어를 입력해주세요.');
+      setFilterUsersInfo([]);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('userInfo')
+      .select('*')
+      .or(`userEmail.ilike.%${searchTerm}%,hotelName.ilike.%${searchTerm}%`);
+
+    if (data?.length === 0) {
+      toast.error('검색된 호텔이 없습니다. 정확히 입력해주세요.');
+      setFilterUsersInfo([]);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      const usersInfoData = data.map((item) => ({
+        id: item.id,
+        name: item.hotelName,
+        email: item.userEmail,
+      }));
+
+      const filterUser = usersInfoData.filter((i) => {
+        return i.id !== myInfo.id && !fList.includes(i.name);
+      });
+
+      setFilterUsersInfo(filterUser);
+    }
+
+    if (error) {
+      console.error('error', error);
+    }
+  };
 
   return (
     <>
@@ -96,39 +113,54 @@ export default function FriendRequestForm() {
           id="friendRequest"
           name="friendRequest"
           type="text"
-          placeholder="(7자~15자)"
-          maxLength={15}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="호텔 이름 혹은 이메일을 입력해주세요."
+          maxLength={50}
         />
-        {/* <img src="/public/pass.png" /> */}
 
-        <FriendButton size="small" colorType="default">
+        <FriendButton
+          size="small"
+          colorType="default"
+          type="button"
+          onClick={handleSearch}
+        >
           검색
         </FriendButton>
       </form>
       <ul>
-        {filterUsersInfo.map((value, index) => {
-          return (
-            <li key={index} css={FriendListItem}>
-              <div css={FriendListNumber}>
-                <span css={SrOnlyStyle}>{index}</span>
-              </div>
-              <span>{value.email}</span>
-              <div css={FriendRequestBtnBox}>
-                <FriendButton
-                  size="ssmall"
-                  colorType="default"
-                  onClick={() => handleFriendRequest(value)}
-                >
-                  친구 요청
-                </FriendButton>
-              </div>
-            </li>
-          );
-        })}
+        {filterUserInfo.length !== 0 &&
+          filterUserInfo.map((value, index) => {
+            return (
+              <li key={index} css={FriendListItem}>
+                <div css={FriendListNumber}>
+                  <span css={SrOnlyStyle}>{index}</span>
+                </div>
+                <span>
+                  {value.name} <span css={friendList}>{value.email}</span>
+                </span>
+
+                <div css={FriendRequestBtnBox}>
+                  <FriendButton
+                    size="small"
+                    colorType="default"
+                    onClick={() => handleFriendRequest(value)}
+                  >
+                    친구 요청
+                  </FriendButton>
+                </div>
+              </li>
+            );
+          })}
       </ul>
     </>
   );
 }
+
+const friendList = css`
+  font-size: 1rem;
+`;
+
 export const Requestform = css`
   display: flex;
   justify-content: space-between;
@@ -153,8 +185,8 @@ export const FriendRequestInput = css`
   }
   outline: none;
 
-  background: url('/public/noPass.png') no-repeat;
-  background: url('/public/pass.png') no-repeat;
+  background: url('/noPass.png') no-repeat;
+  background: url('/pass.png') no-repeat;
   background-position: right 10px top 50%;
   background-size: 6%;
 

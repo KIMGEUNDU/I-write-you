@@ -60,6 +60,11 @@ function MenuButton({
               친구 목록
             </NavLink>
           </li>
+          <li>
+            <NavLink css={nav} to="/myProfile">
+              내 프로필
+            </NavLink>
+          </li>
           <li onClick={handleLogout} css={css({ cursor: 'pointer' })}>
             체크아웃
           </li>

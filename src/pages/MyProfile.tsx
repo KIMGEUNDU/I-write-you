@@ -5,11 +5,15 @@ import { User } from '@supabase/supabase-js';
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useRecoilState } from 'recoil';
+import { myInfoState } from '@/recoil/atom/useFriend';
+import { mq } from '@/style/mq';
 
 function MyProfile() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [hotelName, setHotelName] = useState('');
+  const [myInfo] = useRecoilState(myInfoState);
 
   useEffect(() => {
     fetchUser();
@@ -43,7 +47,12 @@ function MyProfile() {
 
   const updateUser = async () => {
     if (!hotelName.trim()) {
-      alert('호텔 이름을 입력해주세요.');
+      toast.warn('호텔 이름을 입력해주세요.');
+      return;
+    }
+
+    if (myInfo.email === hotelName) {
+      toast.warn('호텔 이름이 변경되지 않았습니다.');
       return;
     }
 
@@ -73,7 +82,10 @@ function MyProfile() {
 
   return (
     <section css={wrapper}>
-      <h2 css={nameTitle}>호텔 이름을 정해주세요</h2>
+      <button css={FriendBackButton} onClick={() => navigate(-1)} type="button">
+        <img src="/back.png" alt="뒤로 가기" />
+      </button>
+      <h2 css={nameTitle}>호텔 이름을 설정해주세요</h2>
       <input
         type="text"
         value={hotelName}
@@ -123,5 +135,20 @@ const updateHotelName = css({
   fontWeight: '500',
   fontSize: '1rem',
 });
+
+export const FriendBackButton = css`
+  border: none;
+  background: transparent;
+  position: absolute;
+  height: 5px;
+  top: 0;
+  left: 6%;
+  cursor: pointer;
+  & > img {
+    ${mq({
+      height: ['29px', '30px', '35px', ' 38px'],
+    })}
+  }
+`;
 
 export default MyProfile;
