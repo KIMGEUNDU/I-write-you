@@ -45,6 +45,36 @@ function MyProfile() {
     }
   };
 
+  const updateSenderName = async () => {
+    if (user) {
+      const { error: senderError } = await supabase
+        .from('friends')
+        .update({ senderName: hotelName })
+        .match({ senderId: user.id });
+
+      if (senderError) {
+        console.error('Error updating senderName: ', senderError);
+        return false;
+      }
+      return true;
+    }
+  };
+
+  const updateReceiverName = async () => {
+    if (user) {
+      const { error: receiverError } = await supabase
+        .from('friends')
+        .update({ receiverName: hotelName })
+        .match({ receiverId: user.id });
+
+      if (receiverError) {
+        console.error('Error updating receiverName: ', receiverError);
+        return false;
+      }
+      return true;
+    }
+  };
+
   const updateUser = async () => {
     if (!hotelName.trim()) {
       toast.warn('호텔 이름을 입력해주세요.');
@@ -68,8 +98,16 @@ function MyProfile() {
 
       if (error) {
         console.error('Error updating user: ', error);
+        return;
       } else {
         console.log('User updated successfully: ', data);
+      }
+
+      const updatedSender = await updateSenderName();
+      const updatedReceiver = await updateReceiverName();
+
+      if (updatedSender && updatedReceiver) {
+        console.log('Friends names updated successfully');
         toast.success('호텔 이름이 설정되었습니다.');
         navigate('/hotel');
       }
