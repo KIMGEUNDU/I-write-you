@@ -223,8 +223,8 @@ export const FriendRequestInput = css`
   }
   outline: none;
 
-  background: url('/noPass.png') no-repeat;
-  background: url('/pass.png') no-repeat;
+  background: url('./noPass.png') no-repeat;
+  background: url('./pass.png') no-repeat;
   background-position: right 10px top 50%;
   background-size: 6%;
 

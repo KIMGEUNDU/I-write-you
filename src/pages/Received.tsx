@@ -107,7 +107,7 @@ export default function Received() {
                   to={`/read/${item.id}`}
                   aria-label="받는 편지함"
                 >
-                  <img css={animationStyle} src="/gift.png" alt="선물" />
+                  <img css={animationStyle} src="./gift.png" alt="선물" />
                 </Link>
               </div>
             );
@@ -132,7 +132,7 @@ export default function Received() {
                 </div>
               ))}
       </div>
-      <img src="/mailMan.png" alt="배달원" css={frontMan} />
+      <img src="./mailMan.png" alt="배달원" css={frontMan} />
       <MenuButton sent />
       {page > 1 && (
         <footer css={footerlayout}>
@@ -203,7 +203,7 @@ const nameAnimationLayout = css({
 const namePlate = mq({
   width: ['6.25rem', '7.375rem', '9.6875rem', '10.625rem'],
   height: ['2.25rem', '2.625rem', '3.5625rem', '4.0625rem'],
-  background: `url('/namePlate.png') no-repeat center / cover`,
+  background: `url('./namePlate.png') no-repeat center / cover`,
 });
 
 const fadeIn = keyframes`

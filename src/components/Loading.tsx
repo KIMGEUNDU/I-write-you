@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
 import { css } from '@emotion/react';
-import loading from '/loading.png';
+import loading from './loading.png';
 
 function Loading() {
   return (

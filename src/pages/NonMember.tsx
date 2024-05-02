@@ -9,7 +9,7 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import gift from '/gift.png';
+import gift from './gift.png';
 import { mq } from '@/style/mq';
 import CryptoJS from 'crypto-js';
 
@@ -78,7 +78,7 @@ function NonMember() {
         if (data[0].attachment) {
           const imgUrl = await supabase.storage
             .from('letter')
-            .getPublicUrl(`attachment/${id}.png`).data.publicUrl;
+            .getPublicUrl(`/attachment/${id}.png`).data.publicUrl;
 
           setAttachmentUrl(imgUrl);
         }
@@ -256,7 +256,7 @@ const secretModal = mq({
   boxSizing: 'border-box',
   width: ['80%', '50%', '50%', '50%'],
   height: '300px',
-  background: `url("/secretCode.png") no-repeat center`,
+  background: `url("./secretCode.png") no-repeat center`,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',

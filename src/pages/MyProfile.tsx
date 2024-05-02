@@ -121,7 +121,7 @@ function MyProfile() {
   return (
     <section css={wrapper}>
       <button css={FriendBackButton} onClick={() => navigate(-1)} type="button">
-        <img src="/back.png" alt="뒤로 가기" />
+        <img src="./back.png" alt="뒤로 가기" />
       </button>
       <h2 css={nameTitle}>호텔 이름을 설정해주세요</h2>
       <input
