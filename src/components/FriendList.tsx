@@ -76,7 +76,7 @@ export default function FreindList() {
           : value.senderName,
       secretQuestion: '',
       secretKey: '',
-      contents: [],
+      contents: '',
     }));
   };
   return (
