@@ -5,7 +5,7 @@ interface LetterState {
   created_at?: string;
   sender: string;
   receiver: string;
-  contents: string[];
+  contents: string;
   secretQuestion?: string;
   secretKey?: string;
   writingPad: number;
@@ -32,6 +32,7 @@ interface Window {
 //친구 - 유저 데이터
 type infoType = {
   id: string;
+  name?: string;
   email: string;
 };
 
@@ -46,4 +47,9 @@ type friendData = {
 interface FriendList {
   freindId: string;
   freindName: string;
+}
+
+declare module 'crypto-js' {
+  export default CryptoJS;
+  export const CryptoJS: any;
 }

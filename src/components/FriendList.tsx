@@ -11,7 +11,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/client';
 
 import { useRecoilState } from 'recoil';
-// import { myInfoState } from '@/recoil/atom/useFriend';
 import { letterState } from '@/recoil/atom/useLetter';
 
 export default function FreindList() {
@@ -77,19 +76,8 @@ export default function FreindList() {
           : value.senderName,
       secretQuestion: '',
       secretKey: '',
-      contents: [],
+      contents: '',
     }));
-    // console.log({
-    //   member: true,
-    //   sender: myInfo!.email,
-    //   receiver:
-    //     myInfo!.email !== value.receiverName
-    //       ? value.receiverName
-    //       : value.senderName,
-    //   secretQuestion: '',
-    //   secretKey: '',
-    //   contents: [],
-    // });
   };
   return (
     <section css={FriendSection}>

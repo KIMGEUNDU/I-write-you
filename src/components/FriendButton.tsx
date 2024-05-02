@@ -17,12 +17,13 @@ const ButtonStyle = styled.button<ButtonStyleProps>`
   ${(props) => buttonType[props.colorType]}
 `;
 
-interface BunttonProps extends ButtonStyleProps {
+interface ButtonProps extends ButtonStyleProps {
+  type?: 'button' | 'submit' | 'reset';
   children: React.ReactNode;
   onClick?: () => void;
 }
 
-const FriendButton = ({ children, onClick, ...styleProps }: BunttonProps) => {
+const FriendButton = ({ children, onClick, ...styleProps }: ButtonProps) => {
   return (
     <ButtonStyle {...styleProps} onClick={onClick}>
       {children}

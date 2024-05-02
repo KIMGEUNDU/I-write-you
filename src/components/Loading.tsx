@@ -6,8 +6,8 @@ import loading from '/loading.png';
 function Loading() {
   return (
     <div css={wrapper}>
-      <img css={img} src={loading} alt="로딩중" aria-hidden="true" />
-      <p css={guide}>로딩중...</p>
+      <img css={img} src={loading} alt="로딩 중" aria-hidden="true" />
+      <p css={guide}>로딩 중...</p>
     </div>
   );
 }

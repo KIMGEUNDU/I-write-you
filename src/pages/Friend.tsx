@@ -12,12 +12,9 @@ import FriendNavButton from '@/components/FriendNavButton';
 import { supabase } from '@/client';
 
 import { useRecoilState } from 'recoil';
-import { usersInfoState, myInfoState } from '@/recoil/atom/useFriend';
+import { myInfoState } from '@/recoil/atom/useFriend';
 
 export default function Friend() {
-  // const main = document.querySelector('main');
-  // main?.setAttribute('style', 'background: #2D3A6F');
-
   const [nav, setNav] = useState('목록');
   const navName = ['목록', '요청'];
   const navigate = useNavigate();
@@ -25,38 +22,6 @@ export default function Friend() {
   // 본인 uuid 값와 email 값
   const [, setMyInfo] = useRecoilState(myInfoState);
 
-  // 다른 사용자들 uuid 값와 email 값 리스트
-  const [, setUsersInfo] = useRecoilState(usersInfoState);
-
-  // // 본인 값 불러오기
-  // useEffect(() => {
-  //   const findMyId = async () => {
-  //     try {
-  //       const {
-  //         data: { user },
-  //       } = await supabase.auth.getUser();
-
-  //       setMyInfo(() => ({ id: user!.id, email: '' }));
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   findMyId();
-
-  //   const fetchId = async () => {
-  //     try {
-  //       const { data } = await supabase
-  //         .from('userInfo')
-  //         .select('*')
-  //         .eq('userId', myInfo.id);
-
-  //       setMyInfo(() => ({ id: myInfo!.id, email: data[0].hotelName }));
-  //     } catch (error) {
-  //       console.log('Error fetching UsersInfo: ', error);
-  //     }
-  //   };
-  //   fetchId();
-  // }, []);
   //* 본인 값 불러오고 그 값으로 자신의 hotelName 가져오기
   useEffect(() => {
     const findAndFetchMyId = async () => {
@@ -95,28 +60,6 @@ export default function Friend() {
     findAndFetchMyId();
   }, []);
 
-  // 다른 사용자 값 불러오기
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const { data } = await supabase
-          .from('userInfo')
-          .select('id, hotelName');
-        if (data && data.length > 0) {
-          const usersInfoData = data.map((item: any) => ({
-            id: item.id,
-            email: item.hotelName,
-          }));
-
-          setUsersInfo(() => [...usersInfoData]);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchUserInfo();
-  }, []);
-
   return (
     <>
       <Helmet>
@@ -131,7 +74,7 @@ export default function Friend() {
               onClick={() => navigate(-1)}
               type="button"
             >
-              <img src="/public/back.png" alt="뒤로 가기" />
+              <img src="/back.png" alt="뒤로 가기" />
             </button>
           </header>
           <section>
@@ -173,23 +116,18 @@ export default function Friend() {
 export const FriendSection = css`
   position: relative;
   width: 100%;
-  height: 100vh;
+  min-height: calc(100vh - 100px);
   background-color: ${Common.colors.darkNavy};
   text-align: center;
+  padding: 50px 0;
 `;
 
 export const FriendBox = mq({
   width: ['100%', '90%', '85%', '792px'],
-  height: ['90%', '90%', '85%', '792px'],
   background: `${Common.colors.lightPink}`,
   margin: 'auto',
   padding: ['30px 0', '32px 0', '38px 0', '40px 0'],
-  color: `${Common.colors.darkNavy}`,
-  'border-radius': '40px',
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  borderRadius: '40px',
 });
 
 export const FreindHeader = css`
@@ -208,6 +146,7 @@ export const FriendBackButton = css`
   height: 5px;
   top: 0;
   left: 6%;
+  cursor: pointer;
   & > img {
     ${mq({
       height: ['29px', '30px', '35px', ' 38px'],

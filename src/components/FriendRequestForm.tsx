@@ -1,31 +1,26 @@
 /** @jsxImportSource @emotion/react */
-
 import { css } from '@emotion/react';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
-
 import FriendButton from './FriendButton';
 import { SrOnlyStyle } from '@/pages/Login';
 import { FriendListItem, FriendListNumber } from './FriendList';
 import { FriendRequestBtnBox } from './FriendReceived';
 import { supabase } from '@/client';
-
 import { useRecoilState } from 'recoil';
-import { usersInfoState, myInfoState } from '@/recoil/atom/useFriend';
+import { myInfoState } from '@/recoil/atom/useFriend';
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function FriendRequestForm() {
-  // 본인 uuid 값와 email 값
+  const [searchTerm, setSearchTerm] = useState('');
   const [myInfo] = useRecoilState(myInfoState);
+  const [filterUserInfo, setFilterUsersInfo] = useState<infoType[]>([]);
+  const [fList, setFriendList] = useState<string[]>([]);
+  const [buttonStates, setButtonStates] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
-  // 다른 사용자들 uuid 값와 email 값 리스트
-  const [usersInfo] = useRecoilState(usersInfoState);
-
-  // let filterUsersInfo: infoType[] = [];
-  const [filterUsersInfo, setFilterUsersInfo] = useState<infoType[]>([]);
-
-  //* 사용자들 정보에서 내정보 필터링
-  //TODO: 친구 요청 할때 이미 요청했거나, 친구인 사용자는 제외하기
   useEffect(() => {
     const fetchFriendList = async () => {
       try {
@@ -34,59 +29,109 @@ export default function FriendRequestForm() {
           .select('*')
           .or(`senderId.eq.${myInfo.id},receiverId.eq.${myInfo.id}`);
 
-        //친구 요청 할때 이미 요청했거나, 친구인 사용자
-        const friendList = data!.map((i) =>
-          i.senderId === myInfo.id ? i.receiverName : i.senderName
-        );
+        const friendList = data!.map((friend) => {
+          if (!friend.status) {
+            setButtonStates((prev) => ({ ...prev, [friend.receiverId]: true }));
+          }
 
-        //*본인과 친구 요청 할때 이미 요청했거나, 친구인 사용자 필터링
-        setFilterUsersInfo(
-          usersInfo.filter(
-            (i) => i.id !== myInfo.id && !friendList.includes(i.email)
-          )
-        );
+          return friend.status && friend.senderId === myInfo.id
+            ? friend.receiverName
+            : friend.senderName;
+        });
+
+        setFriendList(friendList);
       } catch (error) {
         console.error('Error fetching friends:', error);
       }
-      // setFilterUsersInfo((prev) => ({
-      //   prev.filter((i)=>{})})
     };
     fetchFriendList();
-  }, []);
+  }, [myInfo.id]);
 
-  //친구 요청 버튼
   const handleFriendRequest = useCallback(
     async (value: infoType) => {
-      const { data, error } = await supabase.from('friends').upsert([
+      const { error } = await supabase.from('friends').upsert([
         {
           senderId: myInfo.id,
           senderName: myInfo.email,
           receiverId: value.id,
-          receiverName: value.email,
+          receiverName: value.name,
           status: false,
         },
       ]);
       if (error) {
         console.error('업데이트 중 오류 발생: ', error);
       } else {
-        //TODO: 친구요청하면 리스트에서 바로 사라지게하기
-        // setFilterUsersInfo(
-        //   (prev) =>
-        // prev.filter(
-        //   (i) =>
-        //   i.senderId !== value.senderId ||
-        //   i.receiverId !== value.receiverId
-        // )
-        // );
-        console.log('업데이트 성공: ', data);
+        setButtonStates((prev) => ({ ...prev, [value.id]: true }));
+        toast.success(`${value.name} 님에게 친구 신청이 완료되었습니다.`);
       }
     },
     [myInfo.id, myInfo.email]
   );
 
+  const handleSearch = async () => {
+    if (searchTerm.trim() === '') {
+      toast.error('검색어를 입력해주세요.');
+      setFilterUsersInfo([]);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('userInfo')
+      .select('*')
+      // .or(`userEmail.ilike.%${searchTerm}%,hotelName.ilike.%${searchTerm}%`);
+      .ilike('hotelName', `%${searchTerm}%`);
+
+    if (data && data.length > 0) {
+      const usersInfoData = data.map((item) => ({
+        id: item.id,
+        name: item.hotelName,
+        email: item.userEmail,
+      }));
+
+      const filterUser = usersInfoData.filter((user) => {
+        return user.id !== myInfo.id && !fList.includes(user.name);
+      });
+
+      if (filterUser?.length === 0) {
+        toast.error('검색된 호텔이 없습니다. 정확히 입력해주세요.');
+        setFilterUsersInfo([]);
+        return;
+      }
+
+      setFilterUsersInfo(filterUser);
+    }
+
+    if (error) {
+      console.error('error', error);
+    }
+  };
+
+  const handleRejectFriend = async (value: infoType) => {
+    try {
+      const { data } = await supabase
+        .from('friends')
+        .delete()
+        .eq('senderId', myInfo.id)
+        .eq('receiverId', value.id)
+        .eq('status', false);
+
+      setButtonStates((prev) => ({ ...prev, [value.id]: false }));
+      toast.error(`${value.name} 님에게 친구 신청이 취소되었습니다.`);
+
+      console.log('친구 거절 성공:', data);
+    } catch (error) {
+      console.error('친구 거절 중 오류 발생:', error);
+    }
+  };
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    handleSearch();
+  }
+
   return (
     <>
-      <form css={Requestform}>
+      <form css={Requestform} onSubmit={handleSubmit}>
         <label css={SrOnlyStyle} htmlFor="friendRequest">
           친구 요청 보내기
         </label>
@@ -96,39 +141,64 @@ export default function FriendRequestForm() {
           id="friendRequest"
           name="friendRequest"
           type="text"
-          placeholder="(7자~15자)"
-          maxLength={15}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="호텔 이름을 입력해주세요."
+          maxLength={50}
         />
-        {/* <img src="/public/pass.png" /> */}
 
-        <FriendButton size="small" colorType="default">
+        <FriendButton
+          size="small"
+          colorType="default"
+          type="submit"
+          onClick={handleSearch}
+        >
           검색
         </FriendButton>
       </form>
       <ul>
-        {filterUsersInfo.map((value, index) => {
-          return (
-            <li key={index} css={FriendListItem}>
-              <div css={FriendListNumber}>
-                <span css={SrOnlyStyle}>{index}</span>
-              </div>
-              <span>{value.email}</span>
-              <div css={FriendRequestBtnBox}>
-                <FriendButton
-                  size="ssmall"
-                  colorType="default"
-                  onClick={() => handleFriendRequest(value)}
-                >
-                  친구 요청
-                </FriendButton>
-              </div>
-            </li>
-          );
-        })}
+        {filterUserInfo.length !== 0 &&
+          filterUserInfo.map((value, index) => {
+            return (
+              <li key={index} css={FriendListItem}>
+                <div css={FriendListNumber}>
+                  <span css={SrOnlyStyle}>{index}</span>
+                </div>
+                <span>
+                  {value.name} <span css={friendList}>{value.email}</span>
+                </span>
+
+                <div css={FriendRequestBtnBox}>
+                  {!buttonStates[value.id] ? (
+                    <FriendButton
+                      size="small"
+                      colorType="default"
+                      onClick={() => handleFriendRequest(value)}
+                    >
+                      요청
+                    </FriendButton>
+                  ) : (
+                    <FriendButton
+                      size="small"
+                      colorType="red"
+                      onClick={() => handleRejectFriend(value)}
+                    >
+                      취소
+                    </FriendButton>
+                  )}
+                </div>
+              </li>
+            );
+          })}
       </ul>
     </>
   );
 }
+
+const friendList = css`
+  font-size: 1rem;
+`;
+
 export const Requestform = css`
   display: flex;
   justify-content: space-between;
@@ -153,8 +223,8 @@ export const FriendRequestInput = css`
   }
   outline: none;
 
-  background: url('/public/noPass.png') no-repeat;
-  background: url('/public/pass.png') no-repeat;
+  background: url('/noPass.png') no-repeat;
+  background: url('/pass.png') no-repeat;
   background-position: right 10px top 50%;
   background-size: 6%;
 

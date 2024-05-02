@@ -4,14 +4,7 @@ import SelectWritingPad from '@/components/SelectWritingPad';
 import { letterNumberState, letterState } from '@/recoil/atom/useLetter';
 import { Common } from '@/style/Common';
 import { css } from '@emotion/react';
-import {
-  ChangeEvent,
-  FormEvent,
-  KeyboardEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { FiChevronLeft } from 'react-icons/fi';
 import { useRecoilState } from 'recoil';
 import { supabase } from '@/client';
@@ -19,9 +12,9 @@ import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import ShareModal from '@/components/ShareModal';
+import CryptoJS from 'crypto-js';
 
 export default function WriteLetter() {
-  const [line, setLine] = useState('');
   const [photo, setPhoto] = useState('');
   const [havePhoto, setHavePhoto] = useState('첨부');
   const [translate, setTranslate] = useState(0);
@@ -32,16 +25,6 @@ export default function WriteLetter() {
   const [letter, setLetter] = useRecoilState(letterState);
   const navigate = useNavigate();
   const photoRef = useRef<HTMLInputElement | null>(null);
-
-  /* 편지 작성하기 */
-  const handleWritingLetter = (e: KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      setLetter((prev) => ({
-        ...prev,
-        contents: [...prev.contents, line.slice(line.lastIndexOf('\n') + 1)],
-      }));
-    }
-  };
 
   /* 첨부파일 */
   const handlePhoto = (e: ChangeEvent<HTMLInputElement>) => {
@@ -148,33 +131,27 @@ export default function WriteLetter() {
   /* 전송 버튼 클릭 */
   const submitLetter = (e: FormEvent) => {
     e.preventDefault();
-    const lastIndex = line.lastIndexOf('\n');
 
-    if (lastIndex > -1) {
-      setLetter((prev) => ({
-        ...prev,
-        contents: [...prev.contents, line.slice(lastIndex + 1)],
-      }));
+    if (letter.contents === '') {
+      toast.error('편지 내용을 작성해주세요');
     } else {
+      const hash = CryptoJS.AES.encrypt(
+        JSON.stringify(letter.contents),
+        import.meta.env.VITE_CRYPTO_KEY
+      ).toString();
+
       setLetter((prev) => ({
         ...prev,
-        contents: [...prev.contents, line],
+        contents: hash,
       }));
-    }
 
-    setUpload(true);
+      setUpload(true);
+    }
   };
 
   useEffect(() => {
     if (upload) {
-      if (letter.contents.length === 0) {
-        setUpload(false);
-
-        toast.error('편지 내용을 작성해주세요');
-      } else {
-        uploadLetter();
-        setUpload(false);
-      }
+      uploadLetter();
     }
   }, [upload]);
 
@@ -216,8 +193,17 @@ export default function WriteLetter() {
               name="letter"
               placeholder="편지를 작성해주세요"
               css={letterText}
-              onChange={(e) => setLine(e.target.value)}
-              onKeyDown={handleWritingLetter}
+              onChange={(e) =>
+                setLetter((prev) => ({ ...prev, contents: e.target.value }))
+              }
+              // onKeyDown={(e) => {
+              //   if (e.key === 'Enter') {
+              //     setLetter((prev) => ({
+              //       ...prev,
+              //       contents: letter.contents + '</br>',
+              //     }));
+              //   }
+              // }}
             />
           </article>
           <button type="submit" css={sendBtn}>
