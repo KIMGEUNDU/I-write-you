@@ -224,7 +224,7 @@ const contents = css({
   flexDirection: 'column',
   alignItems: 'center',
   padding: '20px 30px',
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  backgroundColor: 'rgba(255, 255, 255, 0.3)',
 });
 
 const attachment = css({
