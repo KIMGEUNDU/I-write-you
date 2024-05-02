@@ -328,26 +328,12 @@ const mailWrapper = mq({
   backgroundColor: 'black',
   opacity: '0.5',
   width: '100%',
-  minWidth: '400px',
   maxWidth: '400px',
-  height: '41%',
-  maxHeight: '41%',
+  height: '50%',
+  maxHeight: '50%',
   transform: 'translateX(-50%)',
-  display: 'flex',
-  alignItems: 'flex-start',
-  flexWrap: 'wrap',
-
-  // '> :nth-of-type(1)': {
-  //   marginLeft: '7px',
-  // },
-
-  // '> :nth-of-type(8n+1)': {
-  //   marginLeft: '7px',
-  // },
-
-  // '> :nth-of-type(8n)': {
-  //   marginRight: 0,
-  // },
+  display: 'grid',
+  gridTemplateColumns: 'repeat(8, 1fr)',
 });
 
 const hotelNameWrapper = css({
@@ -357,6 +343,8 @@ const hotelNameWrapper = css({
   fontSize: '30px',
   color: '#452E72',
   fontFamily: 'InkLipquid',
+  gridRow: 5,
+  gridColumn: '1 / 9',
 });
 
 const footerlayout = css({
