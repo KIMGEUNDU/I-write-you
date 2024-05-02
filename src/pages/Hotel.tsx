@@ -38,7 +38,7 @@ export default function Hotel() {
   const [myInfo, setMyInfo] = useRecoilState(myInfoState);
 
   // 페이지네이션
-  const [limit] = useState(32);
+  const [limit] = useState(24);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
@@ -208,7 +208,6 @@ export default function Hotel() {
                     link="/hotel"
                   />
                 ))}
-          <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
           {page > 1 && (
             <footer css={footerlayout}>
               <LetterPagination
@@ -220,7 +219,9 @@ export default function Hotel() {
             </footer>
           )}
         </ul>
+        <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
       </div>
+      <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
       <MenuButton home={true} />
       <EventControl control={control} setControl={setControl} />
       <ul>
@@ -313,7 +314,7 @@ const writeMail = css({
 const hotelWrapper = css({
   position: 'relative',
   width: '100%',
-  height: '75%',
+  height: '75vh',
   display: 'flex',
   alignItems: 'flex-end',
   background: `url("/hotel.png") no-repeat center`,
@@ -325,26 +326,26 @@ const mailWrapper = mq({
   top: '30.5%',
   left: '50.2%',
   zIndex: '1',
-  backgroundColor: 'black',
-  opacity: '0.5',
+  opacity: '0.75',
   width: '100%',
   maxWidth: '400px',
-  height: '50%',
-  maxHeight: '50%',
+  height: '10%',
+  minHeight: '160px',
+  maxHeight: '10%',
   transform: 'translateX(-50%)',
   display: 'grid',
   gridTemplateColumns: 'repeat(8, 1fr)',
 });
 
 const hotelNameWrapper = css({
-  position: 'relative',
-  width: '95%',
+  position: 'fixed',
+  left: '50%',
+  bottom: '160px',
+  transform: `translateX(-50%)`,
   textAlign: 'center',
   fontSize: '30px',
   color: '#452E72',
   fontFamily: 'InkLipquid',
-  gridRow: 5,
-  gridColumn: '1 / 9',
 });
 
 const footerlayout = css({
