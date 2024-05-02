@@ -15,7 +15,7 @@ import { useRecoilState } from 'recoil';
 function ShareModal({ letterId }: { letterId: number | undefined }) {
   const [letter] = useRecoilState(letterState);
   const { Kakao } = window;
-  const link = `http://localhost:5173/#/nonMember/${letterId}`;
+  const link = `https://likelion-plus.github.io/i-write-you/#/nonMember/${letterId}`;
 
   /* 클립보드 공유 */
   const handleClipboard = () => {
