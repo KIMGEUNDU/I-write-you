@@ -17,6 +17,9 @@ export default function FriendRequestForm() {
   const [myInfo] = useRecoilState(myInfoState);
   const [filterUserInfo, setFilterUsersInfo] = useState<infoType[]>([]);
   const [fList, setFriendList] = useState<string[]>([]);
+  const [buttonStates, setButtonStates] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   useEffect(() => {
     const fetchFriendList = async () => {
@@ -26,8 +29,14 @@ export default function FriendRequestForm() {
           .select('*')
           .or(`senderId.eq.${myInfo.id},receiverId.eq.${myInfo.id}`);
 
-        const friendList = data!.map((i) => {
-          return i.senderId === myInfo.id ? i.receiverName : i.senderName;
+        const friendList = data!.map((friend) => {
+          if (!friend.status) {
+            setButtonStates((prev) => ({ ...prev, [friend.receiverId]: true }));
+          }
+
+          return friend.status && friend.senderId === myInfo.id
+            ? friend.receiverName
+            : friend.senderName;
         });
 
         setFriendList(friendList);
@@ -52,16 +61,11 @@ export default function FriendRequestForm() {
       if (error) {
         console.error('업데이트 중 오류 발생: ', error);
       } else {
-        const filterUser = filterUserInfo.filter(
-          (user) => user.name !== value.name
-        );
-
-        setFilterUsersInfo(filterUser);
-
+        setButtonStates((prev) => ({ ...prev, [value.id]: true }));
         toast.success(`${value.name} 님에게 친구 신청이 완료되었습니다.`);
       }
     },
-    [myInfo.id, myInfo.email, filterUserInfo]
+    [myInfo.id, myInfo.email]
   );
 
   const handleSearch = async () => {
@@ -74,13 +78,8 @@ export default function FriendRequestForm() {
     const { data, error } = await supabase
       .from('userInfo')
       .select('*')
-      .or(`userEmail.ilike.%${searchTerm}%,hotelName.ilike.%${searchTerm}%`);
-
-    if (data?.length === 0) {
-      toast.error('검색된 호텔이 없습니다. 정확히 입력해주세요.');
-      setFilterUsersInfo([]);
-      return;
-    }
+      // .or(`userEmail.ilike.%${searchTerm}%,hotelName.ilike.%${searchTerm}%`);
+      .ilike('hotelName', `%${searchTerm}%`);
 
     if (data && data.length > 0) {
       const usersInfoData = data.map((item) => ({
@@ -89,9 +88,15 @@ export default function FriendRequestForm() {
         email: item.userEmail,
       }));
 
-      const filterUser = usersInfoData.filter((i) => {
-        return i.id !== myInfo.id && !fList.includes(i.name);
+      const filterUser = usersInfoData.filter((user) => {
+        return user.id !== myInfo.id && !fList.includes(user.name);
       });
+
+      if (filterUser?.length === 0) {
+        toast.error('검색된 호텔이 없습니다. 정확히 입력해주세요.');
+        setFilterUsersInfo([]);
+        return;
+      }
 
       setFilterUsersInfo(filterUser);
     }
@@ -101,9 +106,32 @@ export default function FriendRequestForm() {
     }
   };
 
+  const handleRejectFriend = async (value: infoType) => {
+    try {
+      const { data } = await supabase
+        .from('friends')
+        .delete()
+        .eq('senderId', myInfo.id)
+        .eq('receiverId', value.id)
+        .eq('status', false);
+
+      setButtonStates((prev) => ({ ...prev, [value.id]: false }));
+      toast.error(`${value.name} 님에게 친구 신청이 취소되었습니다.`);
+
+      console.log('친구 거절 성공:', data);
+    } catch (error) {
+      console.error('친구 거절 중 오류 발생:', error);
+    }
+  };
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    handleSearch();
+  }
+
   return (
     <>
-      <form css={Requestform}>
+      <form css={Requestform} onSubmit={handleSubmit}>
         <label css={SrOnlyStyle} htmlFor="friendRequest">
           친구 요청 보내기
         </label>
@@ -115,14 +143,14 @@ export default function FriendRequestForm() {
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="호텔 이름 혹은 이메일을 입력해주세요."
+          placeholder="호텔 이름을 입력해주세요."
           maxLength={50}
         />
 
         <FriendButton
           size="small"
           colorType="default"
-          type="button"
+          type="submit"
           onClick={handleSearch}
         >
           검색
@@ -141,13 +169,23 @@ export default function FriendRequestForm() {
                 </span>
 
                 <div css={FriendRequestBtnBox}>
-                  <FriendButton
-                    size="small"
-                    colorType="default"
-                    onClick={() => handleFriendRequest(value)}
-                  >
-                    친구 요청
-                  </FriendButton>
+                  {!buttonStates[value.id] ? (
+                    <FriendButton
+                      size="small"
+                      colorType="default"
+                      onClick={() => handleFriendRequest(value)}
+                    >
+                      요청
+                    </FriendButton>
+                  ) : (
+                    <FriendButton
+                      size="small"
+                      colorType="red"
+                      onClick={() => handleRejectFriend(value)}
+                    >
+                      취소
+                    </FriendButton>
+                  )}
                 </div>
               </li>
             );
