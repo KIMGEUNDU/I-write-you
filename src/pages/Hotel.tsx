@@ -14,9 +14,9 @@ import { css, keyframes } from '@emotion/react';
 import { useRecoilState } from 'recoil';
 import { myInfoState } from '@/recoil/atom/useFriend';
 
-import empty from '/emptyMail.png';
-import newMail from '/newMail.png';
-import view from '/viewMail.png';
+import empty from './emptyMail.png';
+import newMail from './newMail.png';
+import view from './viewMail.png';
 import EventControl from '@/components/EventControl';
 import { supabase } from '@/supabaseClient';
 import LetterPagination from '@/components/LetterPagination';
@@ -318,7 +318,7 @@ const hotelWrapper = css({
   height: '75vh',
   display: 'flex',
   alignItems: 'flex-end',
-  background: `url("/hotel.png") no-repeat center`,
+  background: `url("./hotel.png") no-repeat center`,
   backgroundSize: 'cover',
 });
 

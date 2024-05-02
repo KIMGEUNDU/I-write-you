@@ -358,7 +358,7 @@ const memberSelect = (select: boolean, member: string) =>
     margin: '5px 0',
     border: `2px solid ${Common.colors.darkBrown}`,
     borderRadius: '10px',
-    background: `url(/${
+    background: `url(./${
       select ? 'selectUp' : 'selectDown'
     }.png) no-repeat right`,
     backgroundSize: '20px',
