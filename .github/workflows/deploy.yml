@@ -37,6 +37,9 @@ jobs:
           cache: 'pnpm'
           # cache-dependency-path: ./pnpm-lock.yaml
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+        
       - name: Set environment variables
         run: |
           echo "VITE_CRYPTO_KEY=${{ secrets.VITE_CRYPTO_KEY }}" >> $GITHUB_ENV
