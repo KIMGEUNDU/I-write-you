@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import gift from '/gift.png';
 import { mq } from '@/style/mq';
+import CryptoJS from 'crypto-js';
 
 function NonMember() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ function NonMember() {
   const [codeModal, setCodeModal] = useState(true);
   const [loading, setLoading] = useState(false);
   const [windowSize, setWindowSize] = useState(false);
+  const [content, setContent] = useState('');
 
   /* 엔터키 누를 경우 암호코드 일치 확인 */
   const clickButton = (e: KeyboardEvent) => {
@@ -35,16 +37,7 @@ function NonMember() {
       if (key === keyRef.current.value) {
         setCodeModal(false);
       } else {
-        toast.warn('코드가 일치하지 않습니다', {
-          position: 'top-center',
-          autoClose: 1500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
+        toast.warn('코드가 일치하지 않습니다');
       }
     }
   };
@@ -74,6 +67,14 @@ function NonMember() {
         setLetter(data[0]);
         setLoading(true);
 
+        const bytes = CryptoJS.AES.decrypt(
+          data[0].contents,
+          import.meta.env.VITE_CRYPTO_KEY
+        );
+        const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+        setContent(decryptedData);
+
         if (data[0].attachment) {
           const imgUrl = await supabase.storage
             .from('letter')
@@ -86,8 +87,6 @@ function NonMember() {
 
     getLetter();
   }, []);
-
-  console.log(windowSize);
 
   return (
     <>
@@ -116,7 +115,7 @@ function NonMember() {
                 {letter?.attachment && (
                   <img css={attachment} src={attachmentUrl} alt="첨부파일" />
                 )}
-                {letter?.contents.map((v, i) => (
+                {content.split('\n').map((v, i) => (
                   <span css={line} key={i}>
                     {v}
                   </span>
@@ -225,7 +224,7 @@ const contents = css({
   flexDirection: 'column',
   alignItems: 'center',
   padding: '20px 30px',
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  backgroundColor: 'rgba(255, 255, 255, 0.3)',
 });
 
 const attachment = css({

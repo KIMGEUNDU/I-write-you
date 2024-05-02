@@ -1,15 +1,17 @@
 /** @jsxImportSource @emotion/react */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import { supabase } from '@/client';
 import { css, keyframes } from '@emotion/react';
 
+import LetterPagination from '@/components/LetterPagination';
 import MenuButton from '@/components/MenuButton';
+import { myInfoState } from '@/recoil/atom/useFriend';
 import { debounce } from '@/util/debounce';
 import { letterSentRecent } from '@/util/letterSentRecent';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
-import LetterPagination from '@/components/LetterPagination';
 
 type ReceivedItemProp = {
   id: number;
@@ -18,6 +20,7 @@ type ReceivedItemProp = {
 };
 
 export default function Received() {
+  const [myInfo] = useRecoilState(myInfoState);
   const [receivedData, setReceivedData] = useState<ReceivedItemProp[] | null>(
     null
   );
@@ -25,7 +28,9 @@ export default function Received() {
   const [hover, setHover] = useState<number | null>(null);
 
   // 페이지네이션
-  const [limit] = useState(8);
+  // TODO: mq 1) 12, 2) 24
+  // TODO: mq 12 페이지네이션 기준 -> max 24 편지함
+  const [limit] = useState(12);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
@@ -34,21 +39,26 @@ export default function Received() {
       try {
         const { data } = await supabase
           .from('letter')
-          .select('id, created_at, receiver');
-        // filter: 로그인 - sender 일치할 경우만
-        setReceivedData(
-          data!.sort(
+          .select('id, created_at, receiver')
+          .eq(
+            'receiverId',
+            myInfo.id || JSON.parse(localStorage.getItem('myInfo')!).id
+          );
+
+        if (data) {
+          data.sort(
             (a, b) =>
               new Date(b.created_at).getTime() -
               new Date(a.created_at).getTime()
-          )
-        );
+          );
+          setReceivedData(data);
+        }
       } catch (error) {
         console.log(error);
       }
     };
     fetchReceived();
-  }, []);
+  }, [myInfo]);
 
   useEffect(() => {
     if (receivedData && receivedData?.length % limit != 0) {
@@ -94,7 +104,7 @@ export default function Received() {
                 <div css={namePlateLine} aria-hidden />
                 <Link
                   css={letterBox}
-                  to={`/receivedRead/${item.id}`}
+                  to={`/read/${item.id}`}
                   aria-label="받는 편지함"
                 >
                   <img css={animationStyle} src="/gift.png" alt="선물" />
@@ -103,26 +113,37 @@ export default function Received() {
             );
           })}
         {/* 빈 편지함 */}
-        {page === numPages &&
-          emptyData!.length > 0 &&
-          emptyData!.map((_, index) => (
-            <div css={letterBoxLayout} key={index}>
-              <div css={namePlate} />
-              <div css={namePlateLine} aria-hidden />
-              <div css={letterBox} aria-label="빈 편지함" />
-            </div>
-          ))}
+        {page === numPages
+          ? emptyData!.length > 0 &&
+            emptyData!.map((_, index) => (
+              <div css={letterBoxLayout} key={index}>
+                <div css={namePlate} />
+                <div css={namePlateLine} aria-hidden />
+                <div css={letterBox} aria-label="빈 편지함" />
+              </div>
+            ))
+          : Array(limit)
+              .fill(0)
+              .map((_, index) => (
+                <div css={letterBoxLayout} key={index}>
+                  <div css={namePlate} />
+                  <div css={namePlateLine} aria-hidden />
+                  <div css={letterBox} aria-label="빈 편지함" />
+                </div>
+              ))}
       </div>
       <img src="/mailMan.png" alt="배달원" css={frontMan} />
       <MenuButton sent />
-      <footer css={footerlayout}>
-        <LetterPagination
-          total={receivedData?.length}
-          limit={limit}
-          page={page}
-          setPage={setPage}
-        />
-      </footer>
+      {page > 1 && (
+        <footer css={footerlayout}>
+          <LetterPagination
+            total={receivedData?.length}
+            limit={limit}
+            page={page}
+            setPage={setPage}
+          />
+        </footer>
+      )}
     </section>
   );
 }
@@ -141,37 +162,32 @@ const srOnly = css({
 const background = css({
   position: 'relative',
   width: '100%',
-  height: 'auto',
+  height: '100%',
   background: '#FFC7BA',
-  margin: 'auto 0',
   paddingTop: '2rem',
-  paddingBottom: '16.25rem',
-  overflow: 'hidden',
+  paddingBottom: '150px',
 });
 
-const name = css({
+const name = mq({
   position: 'relative',
   top: '55%',
   left: '50%',
   transform: 'translateX(-50%) translateY(-50%)',
-  width: '70%',
+  width: ['65%', '70%'],
+  fontFamily: 'GangwonEduHyeonokT_OTFMediumA',
   fontSize: '1.875rem',
-  letterSpacing: '-0.1094rem',
+  letterSpacing: '-0.0625rem',
   textAlign: 'center',
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 });
 
+// TODO: 3, 4 mq 편지함 repeat: 5, 6, ...
 const gridLayout = mq({
   display: 'grid',
-  gridTemplateColumns: [
-    'repeat(2, 1fr)',
-    'repeat(3, 1fr)',
-    'repeat(4, 1fr)',
-    'repeat(4, 1fr)',
-  ],
-  rowGap: '2.25rem',
+  gridTemplateColumns: ['repeat(3, 1fr)', 'repeat(4, 1fr)'],
+  rowGap: ['0.75rem', '1rem'],
 });
 
 const letterBoxLayout = css({
@@ -184,9 +200,9 @@ const nameAnimationLayout = css({
   position: 'relative',
 });
 
-const namePlate = css({
-  width: ' 7.875rem',
-  height: '3.0625rem',
+const namePlate = mq({
+  width: ['6.25rem', '7.375rem', '9.6875rem', '10.625rem'],
+  height: ['2.25rem', '2.625rem', '3.5625rem', '4.0625rem'],
   background: `url('/namePlate.png') no-repeat center / cover`,
 });
 
@@ -203,45 +219,49 @@ const hoverName = css({
   position: 'absolute',
   top: '0',
   width: 'max-contents',
-  padding: '0.125rem 0.75rem',
+  padding: '0 0.75rem',
   border: `1px solid ${Common.colors.lightPink}`,
   borderRadius: '0.375rem',
   zIndex: 1,
   background: `${Common.colors.lightMint}`,
   color: `${Common.colors.lightPink}`,
-  fontSize: '1.5rem',
-  letterSpacing: '-0.1094rem',
+  fontFamily: 'GangwonEduHyeonokT_OTFMediumA',
+  fontSize: '2rem',
+  letterSpacing: '-0.0625rem',
   textAlign: 'center',
   animation: `${fadeIn} 0.3s ease-in`,
 });
 
-const namePlateLine = css({
-  width: '0.1875rem',
-  height: '0.75rem',
+const namePlateLine = mq({
+  width: ['0.1875rem', '0.3125rem'],
+  height: ['0.5625rem', '0.5625rem', '0.5625rem', '0.75rem'],
   background: '#A78F6C',
 });
 
-const letterBox = css({
+// TODO: 3, 4 mq 편지함 정사각형 사이즈로 변경
+const letterBox = mq({
   position: 'relative',
-  width: '10.6875rem',
-  height: '11.0625rem',
+  width: ['25lvw', '20lvw', '20lvw', '18lvw'],
+  maxWidth: '13.125rem',
+  height: ['15lvh', '15lvh', '18lvh', '20lvh'],
   background: `${Common.colors.lightMint}`,
   '& img': {
     position: 'absolute',
-    bottom: '0.3125rem',
+    bottom: '10%',
     left: '50%',
-    width: '9rem',
-    height: '9rem',
+    width: ['5rem', '5rem', '6.25rem', '7.5rem'],
+    height: ['5rem', '5rem', '6.25rem', '7.5rem'],
     transform: 'translateX(-50%)',
     objectFit: 'cover',
   },
 });
 
-const frontMan = css({
+const frontMan = mq({
   position: 'fixed',
   left: '50%',
-  bottom: '-5rem',
-  width: '20.5625rem',
+  bottom: '-6lvh',
+  width: ['35lvw', '30lvw'],
+  maxWidth: '11.25rem',
   transform: 'translateX(-50%)',
 });
 
