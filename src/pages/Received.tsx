@@ -28,7 +28,9 @@ export default function Received() {
   const [hover, setHover] = useState<number | null>(null);
 
   // 페이지네이션
-  const [limit] = useState(16);
+  // TODO: mq 1) 12, 2) 24
+  // TODO: mq 12 페이지네이션 기준 -> max 24 편지함
+  const [limit] = useState(12);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
@@ -162,7 +164,8 @@ const background = css({
   width: '100%',
   height: '100%',
   background: '#FFC7BA',
-  padding: '2rem 0',
+  paddingTop: '2rem',
+  paddingBottom: '150px',
 });
 
 const name = mq({
@@ -180,6 +183,7 @@ const name = mq({
   textOverflow: 'ellipsis',
 });
 
+// TODO: 3, 4 mq 편지함 repeat: 5, 6, ...
 const gridLayout = mq({
   display: 'grid',
   gridTemplateColumns: ['repeat(3, 1fr)', 'repeat(4, 1fr)'],
@@ -234,6 +238,7 @@ const namePlateLine = mq({
   background: '#A78F6C',
 });
 
+// TODO: 3, 4 mq 편지함 정사각형 사이즈로 변경
 const letterBox = mq({
   position: 'relative',
   width: ['25lvw', '20lvw', '20lvw', '18lvw'],
