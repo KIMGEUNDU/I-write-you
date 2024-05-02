@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
 import { css } from '@emotion/react';
-import notFound from './404.png';
+import notFound from '/404.png';
 import { Common } from '@/style/Common';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';

@@ -2,7 +2,7 @@
 
 import { Common } from '@/style/Common';
 import { css } from '@emotion/react';
-import mailTruck from './mailTruck.png';
+import mailTruck from '/mailTruck.png';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { mq } from '@/style/mq';
