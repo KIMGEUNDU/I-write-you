@@ -74,7 +74,7 @@ export default function Friend() {
               onClick={() => navigate(-1)}
               type="button"
             >
-              <img src="/back.png" alt="뒤로 가기" />
+              <img src="./back.png" alt="뒤로 가기" />
             </button>
           </header>
           <section>

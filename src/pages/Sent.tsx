@@ -99,7 +99,7 @@ export default function Sent() {
                 to={`/read/${item.id}`}
                 aria-label="보낸 편지함"
               >
-                <img css={animationStyle} src="/key.png" alt="열쇠" />
+                <img css={animationStyle} src="./key.png" alt="열쇠" />
               </Link>
             </div>
           );
@@ -124,7 +124,7 @@ export default function Sent() {
                 </div>
               ))}
       </div>
-      <img src="/frontMan.png" alt="지배인" css={frontMan} />
+      <img src="./frontMan.png" alt="지배인" css={frontMan} />
       {page > 1 && (
         <footer css={footerlayout}>
           <LetterPagination
@@ -193,7 +193,7 @@ const nameAnimationLayout = css({
 const namePlate = mq({
   width: ['100px', '118px', '155px', '170px'],
   height: ['36px', '42px', '57px', '65px'],
-  background: `url('/namePlate.png') no-repeat center / cover`,
+  background: `url('./namePlate.png') no-repeat center / cover`,
 });
 
 const fadeIn = keyframes`

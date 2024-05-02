@@ -119,7 +119,7 @@ export default function Read() {
         <Link to={isSent ? '/sent' : '/received'}>
           <img
             css={giftImg}
-            src={isSent ? '/key.png' : '/gift.png'}
+            src={isSent ? './key.png' : './gift.png'}
             alt={isSent ? '열쇠' : '선물'}
             aria-hidden={true}
           />
