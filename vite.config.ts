@@ -11,6 +11,7 @@ export default defineConfig({
       typescript: true,
     }),
   ],
+  base: '',
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
