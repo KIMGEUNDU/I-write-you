@@ -28,7 +28,7 @@ export default function Received() {
   const [hover, setHover] = useState<number | null>(null);
 
   // 페이지네이션
-  const [limit] = useState(12);
+  const [limit] = useState(16);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
@@ -111,15 +111,24 @@ export default function Received() {
             );
           })}
         {/* 빈 편지함 */}
-        {page === numPages &&
-          emptyData!.length > 0 &&
-          emptyData!.map((_, index) => (
-            <div css={letterBoxLayout} key={index}>
-              <div css={namePlate} />
-              <div css={namePlateLine} aria-hidden />
-              <div css={letterBox} aria-label="빈 편지함" />
-            </div>
-          ))}
+        {page === numPages
+          ? emptyData!.length > 0 &&
+            emptyData!.map((_, index) => (
+              <div css={letterBoxLayout} key={index}>
+                <div css={namePlate} />
+                <div css={namePlateLine} aria-hidden />
+                <div css={letterBox} aria-label="빈 편지함" />
+              </div>
+            ))
+          : Array(limit)
+              .fill(0)
+              .map((_, index) => (
+                <div css={letterBoxLayout} key={index}>
+                  <div css={namePlate} />
+                  <div css={namePlateLine} aria-hidden />
+                  <div css={letterBox} aria-label="빈 편지함" />
+                </div>
+              ))}
       </div>
       <img src="/mailMan.png" alt="배달원" css={frontMan} />
       <MenuButton sent />
@@ -151,21 +160,20 @@ const srOnly = css({
 const background = css({
   position: 'relative',
   width: '100%',
-  height: '100vh',
+  height: '100%',
   background: '#FFC7BA',
-  paddingTop: '2rem',
-  paddingBottom: '16.25rem',
-  overflow: 'hidden',
+  padding: '2rem 0',
 });
 
-const name = css({
+const name = mq({
   position: 'relative',
   top: '55%',
   left: '50%',
   transform: 'translateX(-50%) translateY(-50%)',
-  width: '70%',
+  width: ['65%', '70%'],
+  fontFamily: 'GangwonEduHyeonokT_OTFMediumA',
   fontSize: '1.875rem',
-  letterSpacing: '-0.1094rem',
+  letterSpacing: '-0.0625rem',
   textAlign: 'center',
   whiteSpace: 'nowrap',
   overflow: 'hidden',
@@ -174,13 +182,8 @@ const name = css({
 
 const gridLayout = mq({
   display: 'grid',
-  gridTemplateColumns: [
-    'repeat(2, 1fr)',
-    'repeat(3, 1fr)',
-    'repeat(4, 1fr)',
-    'repeat(4, 1fr)',
-  ],
-  rowGap: '2.25rem',
+  gridTemplateColumns: ['repeat(3, 1fr)', 'repeat(4, 1fr)'],
+  rowGap: ['0.75rem', '1rem'],
 });
 
 const letterBoxLayout = css({
@@ -193,9 +196,9 @@ const nameAnimationLayout = css({
   position: 'relative',
 });
 
-const namePlate = css({
-  width: ' 7.875rem',
-  height: '3.0625rem',
+const namePlate = mq({
+  width: ['6.25rem', '7.375rem', '9.6875rem', '10.625rem'],
+  height: ['2.25rem', '2.625rem', '3.5625rem', '4.0625rem'],
   background: `url('/namePlate.png') no-repeat center / cover`,
 });
 
@@ -212,45 +215,48 @@ const hoverName = css({
   position: 'absolute',
   top: '0',
   width: 'max-contents',
-  padding: '0.125rem 0.75rem',
+  padding: '0 0.75rem',
   border: `1px solid ${Common.colors.lightPink}`,
   borderRadius: '0.375rem',
   zIndex: 1,
   background: `${Common.colors.lightMint}`,
   color: `${Common.colors.lightPink}`,
-  fontSize: '1.5rem',
-  letterSpacing: '-0.1094rem',
+  fontFamily: 'GangwonEduHyeonokT_OTFMediumA',
+  fontSize: '2rem',
+  letterSpacing: '-0.0625rem',
   textAlign: 'center',
   animation: `${fadeIn} 0.3s ease-in`,
 });
 
-const namePlateLine = css({
-  width: '0.1875rem',
-  height: '0.75rem',
+const namePlateLine = mq({
+  width: ['0.1875rem', '0.3125rem'],
+  height: ['0.5625rem', '0.5625rem', '0.5625rem', '0.75rem'],
   background: '#A78F6C',
 });
 
-const letterBox = css({
+const letterBox = mq({
   position: 'relative',
-  width: '10.6875rem',
-  height: '11.0625rem',
+  width: ['25lvw', '20lvw', '20lvw', '18lvw'],
+  maxWidth: '13.125rem',
+  height: ['15lvh', '15lvh', '18lvh', '20lvh'],
   background: `${Common.colors.lightMint}`,
   '& img': {
     position: 'absolute',
-    bottom: '0.3125rem',
+    bottom: '10%',
     left: '50%',
-    width: '9rem',
-    height: '9rem',
+    width: ['5rem', '5rem', '6.25rem', '7.5rem'],
+    height: ['5rem', '5rem', '6.25rem', '7.5rem'],
     transform: 'translateX(-50%)',
     objectFit: 'cover',
   },
 });
 
-const frontMan = css({
+const frontMan = mq({
   position: 'fixed',
   left: '50%',
-  bottom: '-5rem',
-  width: '20.5625rem',
+  bottom: '-6lvh',
+  width: ['35lvw', '30lvw'],
+  maxWidth: '11.25rem',
   transform: 'translateX(-50%)',
 });
 
