@@ -171,18 +171,19 @@ export default function Hotel() {
       <div css={hotelWrapper}>
         <ul css={mailWrapper}>
           {letterData?.slice(offset, offset + limit).map((letter) => (
-            <li key={letter.id}>
-              <Mail
-                mail={Number.isSafeInteger(letter.read)}
-                src={letter.read ? `${view}` : `${newMail}`}
-                alt={
-                  !letter.read
-                    ? '새로운 편지' // 1 -> 0
-                    : '확인 편지' // 2 -> 1
-                }
-                link={`/read/${letter.id}`}
-              />
-            </li>
+            // <li key={letter.id}>
+            <Mail
+              key={letter.id}
+              mail={Number.isSafeInteger(letter.read)}
+              src={letter.read ? `${view}` : `${newMail}`}
+              alt={
+                !letter.read
+                  ? '새로운 편지' // 1 -> 0
+                  : '확인 편지' // 2 -> 1
+              }
+              link={`/read/${letter.id}`}
+            />
+            // </li>
           ))}
           {page === numPages
             ? emptyData!.length > 0 &&
@@ -333,8 +334,21 @@ const mailWrapper = mq({
   minHeight: '160px',
   maxHeight: '10%',
   transform: 'translateX(-50%)',
-  display: 'grid',
-  gridTemplateColumns: 'repeat(8, 1fr)',
+  display: 'flex',
+  alignItems: 'flex-start',
+  flexWrap: 'wrap',
+
+  // '> :nth-of-type(1)': {
+  //   marginLeft: '7px',
+  // },
+
+  // '> :nth-of-type(8n+1)': {
+  //   marginLeft: '7px',
+  // },
+
+  // '> :nth-of-type(8n)': {
+  //   marginRight: 0,
+  // },
 });
 
 const hotelNameWrapper = css({
@@ -346,6 +360,8 @@ const hotelNameWrapper = css({
   fontSize: '30px',
   color: '#452E72',
   fontFamily: 'InkLipquid',
+  gridRow: 5,
+  gridColumn: '1 / 9',
 });
 
 const footerlayout = css({
