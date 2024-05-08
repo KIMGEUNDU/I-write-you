@@ -162,10 +162,11 @@ const srOnly = css({
 const background = css({
   position: 'relative',
   width: '100%',
-  height: '100%',
+  minWidth: '22.5rem', // 380px
+  height: '100lvh',
   background: '#FFC7BA',
   paddingTop: '2rem',
-  paddingBottom: '150px',
+  // paddingBottom: '150px',
 });
 
 const name = mq({
@@ -183,10 +184,14 @@ const name = mq({
   textOverflow: 'ellipsis',
 });
 
-// TODO: 3, 4 mq 편지함 repeat: 5, 6, ...
 const gridLayout = mq({
   display: 'grid',
-  gridTemplateColumns: ['repeat(3, 1fr)', 'repeat(4, 1fr)'],
+  gridTemplateColumns: [
+    'repeat(3, 1fr)',
+    'repeat(4, 1fr)',
+    'repeat(5, 1fr)',
+    'repeat(6, 1fr)',
+  ],
   rowGap: ['0.75rem', '1rem'],
 });
 
@@ -201,8 +206,8 @@ const nameAnimationLayout = css({
 });
 
 const namePlate = mq({
-  width: ['6.25rem', '7.375rem', '9.6875rem', '10.625rem'],
-  height: ['2.25rem', '2.625rem', '3.5625rem', '4.0625rem'],
+  width: ['6.25rem', '7.375rem'],
+  height: ['2.25rem', '2.625rem'],
   background: `url('./namePlate.png') no-repeat center / cover`,
 });
 
@@ -238,12 +243,11 @@ const namePlateLine = mq({
   background: '#A78F6C',
 });
 
-// TODO: 3, 4 mq 편지함 정사각형 사이즈로 변경
 const letterBox = mq({
   position: 'relative',
-  width: ['25lvw', '20lvw', '20lvw', '18lvw'],
-  maxWidth: '13.125rem',
-  height: ['15lvh', '15lvh', '18lvh', '20lvh'],
+  width: ['25lvw', '20lvw', '15lvw', '14lvw'],
+  maxWidth: ['7.5rem', '8.125rem', '13.125rem', '9.0625rem'],
+  height: ['15lvh', '17lvh', '18lvh', '20lvh'],
   background: `${Common.colors.lightMint}`,
   '& img': {
     position: 'absolute',
