@@ -26,10 +26,11 @@ export default function Sent() {
   const [hover, setHover] = useState<number | null>(null);
 
   // 페이지네이션
-  const [limit] = useState(16);
+  const [limit] = useState(12);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
+  /* 보낸 편지 가져오기 */
   useEffect(() => {
     const fetchSent = async () => {
       try {
@@ -56,6 +57,7 @@ export default function Sent() {
     fetchSent();
   }, [myInfo]);
 
+  /* 페이지네이션 */
   useEffect(() => {
     if (sentData && sentData?.length % limit != 0) {
       const emptyData = Array(limit - (sentData!.length % limit))
@@ -154,9 +156,10 @@ const srOnly = css({
 const background = css({
   position: 'relative',
   width: '100%',
-  height: '100%',
+  minWidth: '22.5rem', // 380px
+  height: '100lvh',
   background: `${Common.colors.brown}`,
-  padding: '2rem 0',
+  paddingTop: '2rem',
 });
 
 const name = mq({
@@ -176,7 +179,12 @@ const name = mq({
 
 const gridLayout = mq({
   display: 'grid',
-  gridTemplateColumns: ['repeat(3, 1fr)', 'repeat(4, 1fr)'],
+  gridTemplateColumns: [
+    'repeat(3, 1fr)',
+    'repeat(4, 1fr)',
+    'repeat(5, 1fr)',
+    'repeat(6, 1fr)',
+  ],
   rowGap: ['0.75rem', '1rem'],
 });
 
@@ -191,8 +199,8 @@ const nameAnimationLayout = css({
 });
 
 const namePlate = mq({
-  width: ['100px', '118px', '155px', '170px'],
-  height: ['36px', '42px', '57px', '65px'],
+  width: ['6.25rem', '7.375rem'],
+  height: ['2.25rem', '2.625rem'],
   background: `url('./namePlate.png') no-repeat center / cover`,
 });
 
@@ -230,16 +238,19 @@ const namePlateLine = mq({
 
 const letterBox = mq({
   position: 'relative',
-  width: ['25lvw', '20lvw', '20lvw', '18lvw'],
-  maxWidth: '13.125rem',
-  height: ['15lvh', '15lvh', '18lvh', '20lvh'],
+  width: ['25lvw', '20lvw', '18lvw'],
+  maxWidth: ['7.5rem', '8.125rem', '8.75rem', '9.0625rem'],
+  minWidth: ['5.625rem', '7.1875rem', '8.625rem', '9.0625rem'],
+  height: ['15lvh', '17lvh', '18lvh', '20lvh'],
+  maxHeight: ['7.75rem', '8.125rem', '8.75rem', '9.0625rem'],
+  minHeight: ['6.875rem', '7.8125rem', '8.3125rem', '9.1875rem'],
   background: `${Common.colors.darkBrown}`,
   '& img': {
     position: 'absolute',
     top: 0,
-    left: ['-1lvw', '8px'],
-    width: ['5.625rem', '5.625rem', '6.875rem', '7.8125rem'],
-    height: ['6.25rem', '6.25rem', '7.5rem', '8.75rem'],
+    left: ['-1lvw', '-0.5rem', 0, '-0.9375rem'],
+    width: ['5.625rem', '6.25rem', '6.875rem', '125px'],
+    height: ['6.25rem', '6.875rem', '7.5rem', '8.75rem'],
     objectFit: 'cover',
   },
 });
