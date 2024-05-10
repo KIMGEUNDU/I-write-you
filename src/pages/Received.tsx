@@ -34,6 +34,7 @@ export default function Received() {
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
+  /* 받은 편지 가져오기 */
   useEffect(() => {
     const fetchReceived = async () => {
       try {
@@ -60,6 +61,7 @@ export default function Received() {
     fetchReceived();
   }, [myInfo]);
 
+  /* 페이지네이션 */
   useEffect(() => {
     if (receivedData && receivedData?.length % limit != 0) {
       const emptyData = Array(limit - (receivedData!.length % limit))
@@ -132,7 +134,7 @@ export default function Received() {
                 </div>
               ))}
       </div>
-      <img src="./mailMan.png" alt="배달원" css={frontMan} />
+      <img src="./mailMan.png" alt="배달원" css={deliveryMan} />
       <MenuButton sent />
       {page > 1 && (
         <footer css={footerlayout}>
@@ -247,7 +249,10 @@ const letterBox = mq({
   position: 'relative',
   width: ['25lvw', '20lvw', '15lvw', '14lvw'],
   maxWidth: ['7.5rem', '8.125rem', '13.125rem', '9.0625rem'],
+  minWidth: ['5.625rem', '7.1875rem', '8.625rem', '9.0625rem'],
   height: ['15lvh', '17lvh', '18lvh', '20lvh'],
+  maxHeight: ['7.75rem', '8.125rem', '8.75rem', '9.0625rem'],
+  minHeight: ['6.875rem', '7.8125rem', '8.3125rem', '9.1875rem'],
   background: `${Common.colors.lightMint}`,
   '& img': {
     position: 'absolute',
@@ -260,7 +265,7 @@ const letterBox = mq({
   },
 });
 
-const frontMan = mq({
+const deliveryMan = mq({
   position: 'fixed',
   left: '50%',
   bottom: '-6lvh',
