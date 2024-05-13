@@ -28,9 +28,9 @@ export default function Received() {
   const [hover, setHover] = useState<number | null>(null);
 
   // 페이지네이션
-  // TODO: mq 1) 12, 2) 24
+  // TODO: mq 1) 12, 2) 16, 3) 20, 4) 24
   // TODO: mq 12 페이지네이션 기준 -> max 24 편지함
-  const [limit] = useState(12);
+  const [limit, setLimit] = useState(12);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
@@ -61,7 +61,22 @@ export default function Received() {
     fetchReceived();
   }, [myInfo]);
 
-  /* 페이지네이션 */
+  /* 페이지네이션 편지함 기본 개수 지정 */
+  useEffect(() => {
+    const width = window.innerWidth;
+    if (width < 768) {
+      setLimit(12);
+    } else if (width >= 768 && width <= 992) {
+      setLimit(16);
+    } else if (width <= 1200) {
+      setLimit(20);
+    } else {
+      setLimit(24);
+    }
+    return () => {};
+  });
+
+  /* 페이지네이션 빈 편지함 개수 계산 */
   useEffect(() => {
     if (receivedData && receivedData?.length % limit != 0) {
       const emptyData = Array(limit - (receivedData!.length % limit))
@@ -165,10 +180,12 @@ const background = css({
   position: 'relative',
   width: '100%',
   minWidth: '22.5rem', // 380px
-  height: '100lvh',
+  height: '100%',
+  minHeight: '100lvh',
   background: '#FFC7BA',
   paddingTop: '2rem',
-  // paddingBottom: '150px',
+  paddingBottom: '50px',
+  overflow: 'hidden',
 });
 
 const name = mq({
@@ -256,7 +273,7 @@ const letterBox = mq({
   background: `${Common.colors.lightMint}`,
   '& img': {
     position: 'absolute',
-    bottom: '10%',
+    bottom: '0',
     left: '50%',
     width: ['5rem', '5rem', '6.25rem', '7.5rem'],
     height: ['5rem', '5rem', '6.25rem', '7.5rem'],
@@ -266,11 +283,11 @@ const letterBox = mq({
 });
 
 const deliveryMan = mq({
-  position: 'fixed',
+  position: 'absolute',
   left: '50%',
-  bottom: '-6lvh',
+  bottom: '-50px',
   width: ['35lvw', '30lvw'],
-  maxWidth: '11.25rem',
+  maxWidth: ['9.0625rem', '11.25rem'],
   transform: 'translateX(-50%)',
 });
 

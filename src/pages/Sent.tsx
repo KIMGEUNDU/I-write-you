@@ -157,9 +157,12 @@ const background = css({
   position: 'relative',
   width: '100%',
   minWidth: '22.5rem', // 380px
-  height: '100lvh',
+  height: '100%',
+  minHeight: '100lvh',
   background: `${Common.colors.brown}`,
   paddingTop: '2rem',
+  paddingBottom: '50px',
+  overflow: 'hidden',
 });
 
 const name = mq({
@@ -256,11 +259,11 @@ const letterBox = mq({
 });
 
 const frontMan = mq({
-  position: 'fixed',
+  position: 'absolute',
   left: '50%',
   bottom: 0,
   width: ['35lvw', '30lvw'],
-  maxWidth: '11.25rem',
+  maxWidth: ['9.0625rem', '11.25rem'],
   transform: 'translateX(-50%)',
 });
 
