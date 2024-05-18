@@ -87,7 +87,7 @@ export default function Hotel() {
     findAndFetchMyId();
   }, []);
 
-  // fetch Letter Data
+  /* fetch Letter Data */
   useEffect(() => {
     const fetchLetterData = async () => {
       try {
@@ -113,6 +113,7 @@ export default function Hotel() {
     }
   }, [myInfo]);
 
+  /* 페이지네이션: 편지함 개수 계산 */
   useEffect(() => {
     if (letterData && letterData?.length % limit != 0) {
       const emptyData = Array(limit - (letterData!.length % limit))
@@ -171,7 +172,6 @@ export default function Hotel() {
       <div css={hotelWrapper}>
         <ul css={mailWrapper}>
           {letterData?.slice(offset, offset + limit).map((letter) => (
-            // <li key={letter.id}>
             <Mail
               key={letter.id}
               mail={Number.isSafeInteger(letter.read)}
@@ -220,7 +220,6 @@ export default function Hotel() {
             </footer>
           )}
         </ul>
-        <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
       </div>
       <p css={hotelNameWrapper}>{hotelName} HOTEL</p>
       <MenuButton home={true} />
@@ -263,6 +262,7 @@ const background = css({
   width: '100%',
   fontSize: '25px',
   height: '100vh',
+  minHeight: '41.25rem',
   display: 'flex',
   alignItems: 'flex-end',
 
@@ -315,9 +315,10 @@ const writeMail = css({
 const hotelWrapper = css({
   position: 'relative',
   width: '100%',
-  height: '75vh',
-  display: 'flex',
-  alignItems: 'flex-end',
+  // height: '75vh',
+  minHeight: '33.4375rem',
+  // display: 'flex',
+  // alignItems: 'flex-end',
   background: `url("./hotel.png") no-repeat center`,
   backgroundSize: 'cover',
 });
@@ -352,7 +353,7 @@ const mailWrapper = mq({
 });
 
 const hotelNameWrapper = css({
-  position: 'fixed',
+  position: 'absolute',
   left: '50%',
   bottom: '160px',
   transform: `translateX(-50%)`,
