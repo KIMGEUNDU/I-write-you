@@ -315,7 +315,6 @@ const writeMail = css({
 const hotelWrapper = css({
   position: 'relative',
   width: '100%',
-  // height: '75vh',
   minHeight: '33.4375rem',
   // display: 'flex',
   // alignItems: 'flex-end',
@@ -326,18 +325,16 @@ const hotelWrapper = css({
 const mailWrapper = mq({
   position: 'absolute',
   top: '30.5%',
-  left: '50.2%',
+  left: ['50.5%', '50.3%', '50.2%'],
+  display: 'flex',
+  justifyContent: 'space-evenly',
+  alignItems: 'stretch',
+  flexWrap: 'wrap',
   zIndex: '1',
   opacity: '0.75',
-  width: '100%',
-  maxWidth: '400px',
-  height: '10%',
-  minHeight: '160px',
-  maxHeight: '10%',
+  width: '395px',
+  maxHeight: '11%',
   transform: 'translateX(-50%)',
-  display: 'flex',
-  alignItems: 'flex-start',
-  flexWrap: 'wrap',
 
   // '> :nth-of-type(1)': {
   //   marginLeft: '7px',
