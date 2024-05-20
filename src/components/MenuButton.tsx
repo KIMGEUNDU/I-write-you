@@ -83,7 +83,7 @@ const nav = css({
 });
 
 const menuList = mq({
-  position: 'fixed',
+  position: 'absolute',
   bottom: ['110px', '125px', '125px', '125px'],
   right: '50px',
   zIndex: '1',
@@ -100,7 +100,7 @@ const menuList = mq({
 });
 
 const menuButton = mq({
-  position: 'fixed',
+  position: 'absolute',
   bottom: '40px',
   right: '20px',
   zIndex: '1',
