@@ -37,7 +37,7 @@ export default function Login() {
       <section css={CardFlex}>
         <div css={InviteCard}>
           <h2 css={SrOnlyStyle}>로그인</h2>
-          <img css={LoginTitleImage} src="/loginImage.png" />
+          <img css={LoginTitleImage} src="./loginImage.png" />
           <form
             css={CardForm}
             action=""
@@ -237,7 +237,7 @@ export const StampButton = css`
   })};
 
   color: ${Common.colors.darkPurple};
-  background: url('/stamp.png') no-repeat;
+  background: url('./stamp.png') no-repeat;
   background-position: center right;
 
   ${mq({

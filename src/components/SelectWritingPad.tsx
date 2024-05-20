@@ -29,7 +29,7 @@ function SelectWritingPad({ x }: { x: number }) {
           >
             <img
               css={lettersImg}
-              src={`/bg/letter${i + 1}.jpg`}
+              src={`./bg/letter${i + 1}.jpg`}
               alt="Image By freepik"
             />
             <BsEnvelopeCheckFill css={check(i + 1 === letterIndex)} />

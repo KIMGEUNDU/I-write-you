@@ -11,6 +11,7 @@ export default defineConfig({
       typescript: true,
     }),
   ],
+  base: '/i-write-you/',
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),

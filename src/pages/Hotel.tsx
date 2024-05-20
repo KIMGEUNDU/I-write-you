@@ -318,7 +318,7 @@ const hotelWrapper = css({
   height: '75vh',
   display: 'flex',
   alignItems: 'flex-end',
-  background: `url("/hotel.png") no-repeat center`,
+  background: `url("./hotel.png") no-repeat center`,
   backgroundSize: 'cover',
 });
 

@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import useSession from '@/store/useSession';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
+import LoginButton from '@/components/LoginButton';
 
 export default function Main() {
   const [open, setOpen] = useRecoilState(informationState);
@@ -66,6 +67,8 @@ export default function Main() {
               paddingBottom: '10px',
             }}
           >
+            <LoginButton />
+            <hr />
             <Auth
               supabaseClient={supabase}
               appearance={{ theme: ThemeSupa }}
@@ -123,7 +126,7 @@ const background = css({
   position: 'relative',
   width: '100%',
   height: '80vh',
-  background: `${Common.colors.mint} url("/hotel.png") no-repeat center 85%`,
+  background: `${Common.colors.mint} url("./hotel.png") no-repeat center 85%`,
   backgroundSize: 'auto 70%',
   transform: 'translateY(30%)',
   display: 'flex',
