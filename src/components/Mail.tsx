@@ -19,11 +19,11 @@ function Mail({
   const navigate = useNavigate();
 
   const mailButton = mq({
-    width: '35px',
+    width: '2.1875rem',
     height: '18%',
     border: 'none',
     background: 'transparent',
-    margin: '0 4.5px',
+    margin: '0 4.7px',
     padding: 0,
     cursor: mail ? 'default' : 'pointer',
     '&:hover': css({

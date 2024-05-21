@@ -316,37 +316,32 @@ const hotelWrapper = css({
   position: 'relative',
   width: '100%',
   minHeight: '33.4375rem',
-  // display: 'flex',
-  // alignItems: 'flex-end',
   background: `url("./hotel.png") no-repeat center`,
   backgroundSize: 'cover',
 });
 
 const mailWrapper = mq({
   position: 'absolute',
-  top: '30.5%',
+  top: '30%',
   left: ['50.5%', '50.3%', '50.2%'],
+  transform: 'translateX(-50%)',
   display: 'flex',
   justifyContent: 'space-evenly',
   alignItems: 'stretch',
   flexWrap: 'wrap',
   zIndex: '1',
   opacity: '0.75',
-  width: '395px',
-  maxHeight: '11%',
-  transform: 'translateX(-50%)',
+  width: '24.375rem',
 
-  // '> :nth-of-type(1)': {
-  //   marginLeft: '7px',
-  // },
+  '> :nth-of-type(8n)': {
+    marginLeft: '5.5px',
+    marginRight: '3.5px',
+  },
 
-  // '> :nth-of-type(8n+1)': {
-  //   marginLeft: '7px',
-  // },
-
-  // '> :nth-of-type(8n)': {
-  //   marginRight: 0,
-  // },
+  '> :nth-of-type(8n + 7)': {
+    marginLeft: '3.5px',
+    marginRight: '5.5px',
+  },
 });
 
 const hotelNameWrapper = css({
