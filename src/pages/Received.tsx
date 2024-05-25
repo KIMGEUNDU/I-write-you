@@ -9,6 +9,7 @@ import LetterPagination from '@/components/LetterPagination';
 import MenuButton from '@/components/MenuButton';
 import { myInfoState } from '@/recoil/atom/useFriend';
 import { debounce } from '@/util/debounce';
+import { throttle } from '@/util/throttle';
 import { letterSentRecent } from '@/util/letterSentRecent';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
@@ -27,9 +28,7 @@ export default function Received() {
   const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
   const [hover, setHover] = useState<number | null>(null);
 
-  // 페이지네이션
-  // TODO: mq 1) 12, 2) 16, 3) 20, 4) 24
-  // TODO: mq 12 페이지네이션 기준 -> max 24 편지함
+  /* 페이지네이션 변수 */
   const [limit, setLimit] = useState(12);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
@@ -63,18 +62,26 @@ export default function Received() {
 
   /* 페이지네이션 편지함 기본 개수 지정 */
   useEffect(() => {
-    const width = window.innerWidth;
-    if (width < 768) {
-      setLimit(12);
-    } else if (width >= 768 && width <= 992) {
-      setLimit(16);
-    } else if (width <= 1200) {
-      setLimit(20);
-    } else {
-      setLimit(24);
-    }
-    return () => {};
-  });
+    const updateLimit = () => {
+      const width = window.innerWidth;
+      if (width <= 768) {
+        setLimit(12);
+      } else if (width <= 992) {
+        setLimit(15);
+      } else {
+        setLimit(18);
+      }
+    };
+
+    const throttledUpdateLimit = throttle(updateLimit);
+
+    updateLimit();
+    window.addEventListener('resize', throttle(throttledUpdateLimit));
+
+    return () => {
+      window.removeEventListener('resize', throttledUpdateLimit);
+    };
+  }, []);
 
   /* 페이지네이션 빈 편지함 개수 계산 */
   useEffect(() => {
@@ -176,7 +183,7 @@ const srOnly = css({
   margin: '-1px',
 });
 
-const background = css({
+const background = mq({
   position: 'relative',
   width: '100%',
   minWidth: '22.5rem', // 380px
@@ -184,7 +191,7 @@ const background = css({
   minHeight: '100lvh',
   background: '#FFC7BA',
   paddingTop: '2rem',
-  paddingBottom: '50px',
+  paddingBottom: ['4rem', '1rem', '2rem', '5rem'],
   overflow: 'hidden',
 });
 
@@ -266,17 +273,17 @@ const letterBox = mq({
   position: 'relative',
   width: ['25lvw', '20lvw', '15lvw', '14lvw'],
   maxWidth: ['7.5rem', '8.125rem', '13.125rem', '9.0625rem'],
-  minWidth: ['5.625rem', '7.1875rem', '8.625rem', '9.0625rem'],
+  minWidth: ['6rem', '7.1875rem', '8.625rem', '9.0625rem'],
   height: ['15lvh', '17lvh', '18lvh', '20lvh'],
-  maxHeight: ['7.75rem', '8.125rem', '8.75rem', '9.0625rem'],
-  minHeight: ['6.875rem', '7.8125rem', '8.3125rem', '9.1875rem'],
+  maxHeight: ['8.5rem', '8.125rem', '8.75rem', '9.0625rem'],
+  minHeight: ['6rem', '7.8125rem', '8.3125rem', '9.1875rem'],
   background: `${Common.colors.lightMint}`,
   '& img': {
     position: 'absolute',
     bottom: '0',
     left: '50%',
-    width: ['5rem', '5rem', '6.25rem', '7.5rem'],
-    height: ['5rem', '5rem', '6.25rem', '7.5rem'],
+    width: ['5.625rem', '6.25rem', '6.875rem', '7.8125rem'],
+    height: ['6.25rem', '6.875rem', '7.5rem', '8.75rem'],
     transform: 'translateX(-50%)',
     objectFit: 'cover',
   },
