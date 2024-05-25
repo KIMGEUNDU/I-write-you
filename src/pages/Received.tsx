@@ -9,7 +9,6 @@ import LetterPagination from '@/components/LetterPagination';
 import MenuButton from '@/components/MenuButton';
 import { myInfoState } from '@/recoil/atom/useFriend';
 import { debounce } from '@/util/debounce';
-import { throttle } from '@/util/throttle';
 import { letterSentRecent } from '@/util/letterSentRecent';
 import { mq } from '@/style/mq';
 import { Common } from '@/style/Common';
@@ -73,10 +72,10 @@ export default function Received() {
       }
     };
 
-    const throttledUpdateLimit = throttle(updateLimit);
+    const throttledUpdateLimit = debounce(updateLimit, 1000);
 
     updateLimit();
-    window.addEventListener('resize', throttle(throttledUpdateLimit));
+    window.addEventListener('resize', throttledUpdateLimit);
 
     return () => {
       window.removeEventListener('resize', throttledUpdateLimit);
