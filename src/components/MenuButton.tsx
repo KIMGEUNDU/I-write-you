@@ -12,10 +12,14 @@ function MenuButton({
   sent,
   received,
   home,
+  friend,
+  profile,
 }: {
   sent?: boolean;
   received?: boolean;
   home?: boolean;
+  friend?: boolean;
+  profile?: boolean;
 }) {
   const navigate = useNavigate();
   const [click, setClick] = useState(false);
@@ -55,16 +59,20 @@ function MenuButton({
               </NavLink>
             </li>
           )}
-          <li>
-            <NavLink css={nav} to="/friend">
-              친구 목록
-            </NavLink>
-          </li>
-          <li>
-            <NavLink css={nav} to="/myProfile">
-              내 프로필
-            </NavLink>
-          </li>
+          {!friend && (
+            <li>
+              <NavLink css={nav} to="/friend">
+                친구 목록
+              </NavLink>
+            </li>
+          )}
+          {!profile && (
+            <li>
+              <NavLink css={nav} to="/myProfile">
+                내 프로필
+              </NavLink>
+            </li>
+          )}
           <li onClick={handleLogout} css={css({ cursor: 'pointer' })}>
             체크아웃
           </li>
