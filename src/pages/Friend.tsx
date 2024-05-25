@@ -13,6 +13,7 @@ import { supabase } from '@/client';
 
 import { useRecoilState } from 'recoil';
 import { myInfoState } from '@/recoil/atom/useFriend';
+import MenuButton from '@/components/MenuButton';
 
 export default function Friend() {
   const [nav, setNav] = useState('목록');
@@ -108,6 +109,7 @@ export default function Friend() {
             {nav === '목록' ? <FreindList /> : <FriendReceived />}
           </section>
         </div>
+        <MenuButton friend={true} />
       </section>
     </>
   );
