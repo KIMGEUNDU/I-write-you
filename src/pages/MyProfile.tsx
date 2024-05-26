@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import { myInfoState } from '@/recoil/atom/useFriend';
 import { mq } from '@/style/mq';
+import MenuButton from '@/components/MenuButton';
 
 function MyProfile() {
   const navigate = useNavigate();
@@ -119,31 +120,44 @@ function MyProfile() {
   };
 
   return (
-    <section css={wrapper}>
-      <button css={FriendBackButton} onClick={() => navigate(-1)} type="button">
-        <img src="./back.png" alt="뒤로 가기" />
-      </button>
-      <h2 css={nameTitle}>호텔 이름을 설정해주세요</h2>
-      <input
-        type="text"
-        value={hotelName}
-        onChange={handleChange}
-        css={hotelNameWrapper}
-      />
-      <button type="button" onClick={updateUser} css={updateHotelName}>
-        설정
-      </button>
-    </section>
+    <div css={background}>
+      <section css={wrapper}>
+        <button
+          css={FriendBackButton}
+          onClick={() => navigate(-1)}
+          type="button"
+        >
+          <img src="./back.png" alt="뒤로 가기" />
+        </button>
+        <h2 css={nameTitle}>호텔 이름을 설정해주세요</h2>
+        <input
+          type="text"
+          value={hotelName}
+          onChange={handleChange}
+          css={hotelNameWrapper}
+        />
+        <button type="button" onClick={updateUser} css={updateHotelName}>
+          설정
+        </button>
+      </section>
+      <MenuButton profile={true} />
+    </div>
   );
 }
 
+const background = css({
+  position: 'relative',
+  width: '100%',
+  height: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
 const wrapper = css({
   textAlign: 'center',
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  marginTop: '-70px',
+  position: 'relative',
 });
 
 const hotelNameWrapper = css({
@@ -158,9 +172,9 @@ const hotelNameWrapper = css({
   backgroundColor: 'rgba(255, 255, 255, 0.5)',
 });
 
-const nameTitle = css({
+const nameTitle = mq({
   marginBottom: '10px',
-  fontSize: '30px',
+  fontSize: ['20px', '21px', '25px', '30px'],
   fontWeight: '400',
 });
 
@@ -174,19 +188,18 @@ const updateHotelName = css({
   fontSize: '1rem',
 });
 
-export const FriendBackButton = css`
-  border: none;
-  background: transparent;
-  position: absolute;
-  height: 5px;
-  top: 0;
-  left: 6%;
-  cursor: pointer;
-  & > img {
-    ${mq({
-      height: ['29px', '30px', '35px', ' 38px'],
-    })}
-  }
-`;
+export const FriendBackButton = mq({
+  border: 'none',
+  background: 'transparent',
+  position: 'absolute',
+  height: '5px',
+  top: 0,
+  left: '6%',
+  cursor: 'pointer',
+  '& > img': {
+    transform: 'translateY(20%)',
+    height: ['20px', '21px', '25px', '30px'],
+  },
+});
 
 export default MyProfile;

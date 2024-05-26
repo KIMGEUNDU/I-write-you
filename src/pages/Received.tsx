@@ -27,13 +27,12 @@ export default function Received() {
   const [emptyData, setEmptyData] = useState<Array<number> | null>([]);
   const [hover, setHover] = useState<number | null>(null);
 
-  // 페이지네이션
-  // TODO: mq 1) 12, 2) 24
-  // TODO: mq 12 페이지네이션 기준 -> max 24 편지함
-  const [limit] = useState(12);
+  /* 페이지네이션 변수 */
+  const [limit, setLimit] = useState(12);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * limit;
 
+  /* 받은 편지 가져오기 */
   useEffect(() => {
     const fetchReceived = async () => {
       try {
@@ -60,6 +59,30 @@ export default function Received() {
     fetchReceived();
   }, [myInfo]);
 
+  /* 페이지네이션 편지함 기본 개수 지정 */
+  useEffect(() => {
+    const updateLimit = () => {
+      const width = window.innerWidth;
+      if (width <= 768) {
+        setLimit(12);
+      } else if (width <= 992) {
+        setLimit(15);
+      } else {
+        setLimit(18);
+      }
+    };
+
+    const throttledUpdateLimit = debounce(updateLimit, 1000);
+
+    updateLimit();
+    window.addEventListener('resize', throttledUpdateLimit);
+
+    return () => {
+      window.removeEventListener('resize', throttledUpdateLimit);
+    };
+  }, []);
+
+  /* 페이지네이션 빈 편지함 개수 계산 */
   useEffect(() => {
     if (receivedData && receivedData?.length % limit != 0) {
       const emptyData = Array(limit - (receivedData!.length % limit))
@@ -132,7 +155,7 @@ export default function Received() {
                 </div>
               ))}
       </div>
-      <img src="./mailMan.png" alt="배달원" css={frontMan} />
+      <img src="./mailMan.png" alt="배달원" css={deliveryMan} />
       <MenuButton sent />
       {page > 1 && (
         <footer css={footerlayout}>
@@ -159,13 +182,16 @@ const srOnly = css({
   margin: '-1px',
 });
 
-const background = css({
+const background = mq({
   position: 'relative',
   width: '100%',
+  minWidth: '22.5rem', // 380px
   height: '100%',
+  minHeight: '100lvh',
   background: '#FFC7BA',
   paddingTop: '2rem',
-  paddingBottom: '150px',
+  paddingBottom: ['4rem', '1rem', '2rem', '5rem'],
+  overflow: 'hidden',
 });
 
 const name = mq({
@@ -183,10 +209,14 @@ const name = mq({
   textOverflow: 'ellipsis',
 });
 
-// TODO: 3, 4 mq 편지함 repeat: 5, 6, ...
 const gridLayout = mq({
   display: 'grid',
-  gridTemplateColumns: ['repeat(3, 1fr)', 'repeat(4, 1fr)'],
+  gridTemplateColumns: [
+    'repeat(3, 1fr)',
+    'repeat(4, 1fr)',
+    'repeat(5, 1fr)',
+    'repeat(6, 1fr)',
+  ],
   rowGap: ['0.75rem', '1rem'],
 });
 
@@ -201,8 +231,8 @@ const nameAnimationLayout = css({
 });
 
 const namePlate = mq({
-  width: ['6.25rem', '7.375rem', '9.6875rem', '10.625rem'],
-  height: ['2.25rem', '2.625rem', '3.5625rem', '4.0625rem'],
+  width: ['6.25rem', '7.375rem'],
+  height: ['2.25rem', '2.625rem'],
   background: `url('./namePlate.png') no-repeat center / cover`,
 });
 
@@ -238,30 +268,32 @@ const namePlateLine = mq({
   background: '#A78F6C',
 });
 
-// TODO: 3, 4 mq 편지함 정사각형 사이즈로 변경
 const letterBox = mq({
   position: 'relative',
-  width: ['25lvw', '20lvw', '20lvw', '18lvw'],
-  maxWidth: '13.125rem',
-  height: ['15lvh', '15lvh', '18lvh', '20lvh'],
+  width: ['25lvw', '20lvw', '15lvw', '14lvw'],
+  maxWidth: ['7.5rem', '8.125rem', '13.125rem', '9.0625rem'],
+  minWidth: ['6rem', '7.1875rem', '8.625rem', '9.0625rem'],
+  height: ['15lvh', '17lvh', '18lvh', '20lvh'],
+  maxHeight: ['8.5rem', '8.125rem', '8.75rem', '9.0625rem'],
+  minHeight: ['6rem', '7.8125rem', '8.3125rem', '9.1875rem'],
   background: `${Common.colors.lightMint}`,
   '& img': {
     position: 'absolute',
-    bottom: '10%',
+    bottom: '0',
     left: '50%',
-    width: ['5rem', '5rem', '6.25rem', '7.5rem'],
-    height: ['5rem', '5rem', '6.25rem', '7.5rem'],
+    width: ['5.625rem', '6.25rem', '6.875rem', '7.8125rem'],
+    height: ['6.25rem', '6.875rem', '7.5rem', '8.75rem'],
     transform: 'translateX(-50%)',
     objectFit: 'cover',
   },
 });
 
-const frontMan = mq({
-  position: 'fixed',
+const deliveryMan = mq({
+  position: 'absolute',
   left: '50%',
-  bottom: '-6lvh',
+  bottom: '-50px',
   width: ['35lvw', '30lvw'],
-  maxWidth: '11.25rem',
+  maxWidth: ['9.0625rem', '11.25rem'],
   transform: 'translateX(-50%)',
 });
 
